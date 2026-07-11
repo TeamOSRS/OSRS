@@ -1,0 +1,36 @@
+<mujoco model="dual_open_manipulator_x">
+  <compiler angle="radian"/>
+
+  <option cone="elliptic" impratio="10" timestep="0.002"/>
+
+  <!-- Include separate subassembly files -->
+  <include file="dual_arms.xml"/>
+  <include file="plate_assembly.xml"/>
+
+  <contact>
+    <!-- Exclude collisions between arm links and plate/coupler since we hold them via weld constraints -->
+    <exclude body1="left_link5" body2="plate_assembly"/>
+    <exclude body1="right_link5" body2="plate_assembly"/>
+    <exclude body1="left_gripper_left" body2="plate_assembly"/>
+    <exclude body1="left_gripper_right" body2="plate_assembly"/>
+    <exclude body1="right_gripper_left" body2="plate_assembly"/>
+    <exclude body1="right_gripper_right" body2="plate_assembly"/>
+  </contact>
+
+  <equality>
+    <!-- Weld constraints to dynamically hold couplers rigidly in place.
+         Using high-quality compliance (solref/solimp) to ensure numerical stability. -->
+    <weld name="left_weld" body1="left_link5" body2="plate_assembly" relpose="0.3758 0 0 1 0 0 0" solref="0.005 1" solimp="0.99 0.999 0.001 0.5 2"/>
+    <weld name="right_weld" body1="right_link5" body2="plate_assembly" relpose="0.3758 0 0 0 0 0 1" solref="0.005 1" solimp="0.99 0.999 0.001 0.5 2"/>
+  </equality>
+
+  <!-- Keyframe resolved using DLS site-based IK for grasp frames -->
+  <keyframe>
+    <key name="home" qpos="0 -0.5938813 0.56172391 0.03215739 0.015 -0.015
+                           0 -0.5938813 0.56172391 0.03215739 0.015 -0.015
+                           0 0 0.2 1 0 0 0
+                           0.08 0 0.22 1 0 0 0" 
+                    ctrl="0 -0.5938813 0.56172391 0.03215739 0.015
+                          0 -0.5938813 0.56172391 0.03215739 0.015"/>
+  </keyframe>
+</mujoco>

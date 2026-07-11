@@ -1,0 +1,173 @@
+<mujoco model="plate_assembly">
+
+  <compiler angle="radian"/>
+
+  <option gravity="0 0 -9.81"/>
+
+  <asset>
+
+    <!-- Materials -->
+    <material name="grey" rgba="0.6 0.6 0.6 1"/>
+    <material name="plate_mat" rgba="0.2 0.4 0.6 0.8"/>
+    <material name="ball_mat" rgba="0.8 0.2 0.2 1"/>
+
+    <!-- Meshes -->
+    <mesh name="coupler"
+          file="assets/coupler.stl"
+          scale="0.001 0.001 0.001"/>
+
+    <mesh name="plate"
+          file="assets/plateV2.stl"
+          scale="0.001 0.001 0.001"/>
+
+  </asset>
+
+  <worldbody>
+
+    <!-- ================================= -->
+    <!-- PLATE ASSEMBLY -->
+    <!-- ================================= -->
+
+    <body name="plate_assembly" pos="0 0 0.2">
+
+      <!-- Free Joint -->
+      <freejoint name="plate_joint"/>
+
+      <!-- ================================= -->
+      <!-- PLATE -->
+      <!-- ================================= -->
+
+      <!-- Visual -->
+      <geom name="plate_visual"
+            type="mesh"
+            mesh="plate"
+            material="plate_mat"
+            pos="-0.225 0 0.0125"
+            quat="0.5 0.5 0.5 0.5"
+            contype="0"
+            conaffinity="0"
+            density="0"
+            group="2"/>
+
+      <!-- Collision (Decomposed into box primitives so the channel is hollow) -->
+      <geom name="plate_bottom_collision"
+            type="box"
+            size="0.225 0.025 0.001"
+            pos="0 0 -0.0115"
+            friction="0.05 0.005 0.0001"
+            group="3"
+            density="1350"/>
+      <geom name="plate_left_wall_collision"
+            type="box"
+            size="0.225 0.001 0.0115"
+            pos="0 0.024 0.001"
+            friction="0.05 0.005 0.0001"
+            group="3"
+            density="1350"/>
+      <geom name="plate_right_wall_collision"
+            type="box"
+            size="0.225 0.001 0.0115"
+            pos="0 -0.024 0.001"
+            friction="0.05 0.005 0.0001"
+            group="3"
+            density="1350"/>
+
+      <!-- ================================= -->
+      <!-- LEFT COUPLER -->
+      <!-- ================================= -->
+
+      <body name="left_coupler"
+            pos="-0.260 0 0">
+
+        <!-- Visual -->
+        <geom name="left_coupler_visual"
+              type="mesh"
+              mesh="coupler"
+              material="grey"
+              quat="0.5 0.5 0.5 0.5"
+              contype="0"
+              conaffinity="0"
+              density="0"
+              group="2"/>
+
+        <!-- Collision -->
+        <geom name="left_coupler_collision"
+              type="mesh"
+              mesh="coupler"
+              quat="0.5 0.5 0.5 0.5"
+              density="800"
+              friction="1.0 0.005 0.0001"
+              contype="1"
+              conaffinity="1"
+              group="3"/>
+
+      </body>
+
+      <!-- ================================= -->
+      <!-- RIGHT COUPLER -->
+      <!-- ================================= -->
+
+      <body name="right_coupler"
+            pos="0.260 0 0"
+            euler="0 0 3.14159">
+
+        <!-- Visual -->
+        <geom name="right_coupler_visual"
+              type="mesh"
+              mesh="coupler"
+              material="grey"
+              quat="0.5 0.5 0.5 0.5"
+              contype="0"
+              conaffinity="0"
+              density="0"
+              group="2"/>
+
+        <!-- Collision -->
+        <geom name="right_coupler_collision"
+              type="mesh"
+              mesh="coupler"
+              quat="0.5 0.5 0.5 0.5"
+              density="800"
+              friction="1.0 0.005 0.0001"
+              contype="1"
+              conaffinity="1"
+              group="3"/>
+
+      </body>
+
+    </body>
+
+    <!-- ================================= -->
+    <!-- BALL -->
+    <!-- ================================= -->
+
+    <!-- Corrected Ball Position -->
+    <body name="ball" pos="0 0 0.14">
+
+      <freejoint name="ball_joint"/>
+
+      <!-- Collision -->
+      <geom name="ball_collision"
+            type="sphere"
+            size="0.015"
+            material="ball_mat"
+            density="2700"
+            friction="0.02 0.005 0.0001"
+            contype="1"
+            conaffinity="1"
+            group="3"/>
+
+      <!-- Visual -->
+      <geom name="ball_visual"
+            type="sphere"
+            size="0.015"
+            material="ball_mat"
+            contype="0"
+            conaffinity="0"
+            group="2"/>
+
+    </body>
+
+  </worldbody>
+
+</mujoco>

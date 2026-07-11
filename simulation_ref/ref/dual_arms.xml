@@ -1,0 +1,237 @@
+<mujoco model="dual_arms">
+  <compiler angle="radian" />
+  <asset>
+    <material name="black" rgba="0.1 0.1 0.1 1" />
+    <mesh name="link1" file="assets/link1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="link2" file="assets/link2.stl" scale="0.001 0.001 0.001" />
+    <mesh name="link3" file="assets/link3.stl" scale="0.001 0.001 0.001" />
+    <mesh name="link4" file="assets/link4.stl" scale="0.001 0.001 0.001" />
+    <mesh name="link5" file="assets/link5.stl" scale="0.001 0.001 0.001" />
+    <mesh name="gripper_left_palm" file="assets/gripper_left_palm.stl" scale="0.001 0.001 0.001" />
+    <mesh name="gripper_right_palm" file="assets/gripper_right_palm.stl" scale="0.001 0.001 0.001" />
+  </asset>
+
+  <default>
+    <!-- XM430-W350-T: Joint 1, 2, 3, 4 -->
+    <default class="XM430">
+      <joint frictionloss="0.1" armature="0.1" />
+      <position kp="80" dampratio="1" forcerange="-4.1 4.1" />
+      <default class="Joint1">
+        <joint axis="0 0 1" range="-3.14159 3.14159" />
+      </default>
+      <default class="Joint2">
+        <joint axis="0 1 0" range="-1.5 1.5" />
+      </default>
+      <default class="Joint3">
+        <joint axis="0 1 0" range="-1.5 1.4" />
+      </default>
+      <default class="Joint4">
+        <joint axis="0 1 0" range="-1.7 1.97" />
+      </default>
+    </default>
+    <!-- XL430-W250-T: Gripper -->
+    <default class="XL430">
+      <joint frictionloss="0.1" armature="0.1" />
+      <position kp="50" dampratio="1" forcerange="-1.5 1.5" />
+      <default class="Gripper">
+        <joint axis="0 1 0" type="slide" range="-0.01 0.019" />
+      </default>
+      <default class="Gripper_mimic">
+        <joint axis="0 -1 0" type="slide" range="-0.01 0.019" />
+      </default>
+    </default>
+    <!-- Visual / Collision -->
+    <default class="visual">
+      <geom type="mesh" contype="0" conaffinity="0" density="0" group="2" material="black" />
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" material="black" />
+    </default>
+  </default>
+
+  <worldbody>
+    <!-- LEFT ARM -->
+    <body name="left_link1" pos="-0.46 0 0">
+      <geom mesh="link1" class="visual" />
+      <geom mesh="link1" class="collision" />
+      <body name="left_link2" pos="0.012 0 0.017">
+        <inertial pos="-0.000301849 0.000540437 0.0474335"
+          quat="0.999915 0.000960074 0.0122201 -0.00449872" mass="0.0984068"
+          diaginertia="3.4553e-05 3.26892e-05 1.88409e-05" />
+        <joint name="left_Joint1" class="Joint1" />
+        <geom pos="0 0 0.019" mesh="link2" class="visual" />
+        <geom pos="0 0 0.019" mesh="link2" class="collision" />
+        <body name="left_link3" pos="0 0 0.0595">
+          <inertial pos="0.0103084 0.000377434 0.101702" quat="0.71133 0.0466763 0.0513691 0.699423"
+            mass="0.138509" diaginertia="0.000342915 0.000335932 5.49578e-05" />
+          <joint name="left_Joint2" class="Joint2" />
+          <geom mesh="link3" class="visual" />
+          <geom mesh="link3" class="collision" />
+          <body name="left_link4" pos="0.024 0 0.128">
+            <inertial pos="0.0909096 0.000389298 0.000224133"
+              quat="-0.00162881 0.706672 0.0026348 0.707535" mass="0.132746"
+              diaginertia="0.000251551 0.000242311 3.06462e-05" />
+            <joint name="left_Joint3" class="Joint3" />
+            <geom mesh="link4" class="visual" />
+            <geom mesh="link4" class="collision" />
+            <body name="left_link5" pos="0.124 0 0">
+              <inertial pos="0.0442068 3.684e-07 0.00891422"
+                quat="0.479052 0.479052 -0.520105 0.520105" mass="0.143276"
+                diaginertia="9.3211e-05 8.07871e-05 7.59805e-05" />
+              <joint name="left_Joint4" class="Joint4" />
+              <geom mesh="link5" class="visual" />
+              <geom mesh="link5" class="collision" />
+              <!-- Ggrasp frame site positioned exactly between the gripper jaws -->
+              <site name="left_grasp_frame" pos="0.100 0 0" quat="1 0 0 0" size="0.002"
+                rgba="0 1 0 0.5" />
+              <body name="left_gripper_left" pos="0.0817 0.021 0">
+                <inertial pos="0 0 0" mass="0.001" diaginertia="1e-06 1e-06 1e-06" />
+                <joint name="left_Gripper" class="Gripper" />
+                <geom mesh="gripper_left_palm" class="visual" />
+                <geom mesh="gripper_left_palm" class="collision" />
+              </body>
+              <body name="left_gripper_right" pos="0.0817 -0.021 0">
+                <inertial pos="0 0 0" mass="0.001" diaginertia="1e-06 1e-06 1e-06" />
+                <joint name="left_Gripper_mimic" class="Gripper_mimic" />
+                <geom mesh="gripper_right_palm" class="visual" />
+                <geom mesh="gripper_right_palm" class="collision" />
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- RIGHT ARM -->
+    <body name="right_link1"
+      pos="0.46 0 0"
+      euler="0 0 3.14159">
+
+      <geom mesh="link1" class="visual" />
+      <geom mesh="link1" class="collision" />
+
+      <body name="right_link2" pos="0.012 0 0.017">
+
+        <inertial pos="-0.000301849 0.000540437 0.0474335"
+          quat="0.999915 0.000960074 0.0122201 -0.00449872"
+          mass="0.0984068"
+          diaginertia="3.4553e-05 3.26892e-05 1.88409e-05" />
+
+        <joint name="right_Joint1" class="Joint1" />
+
+        <geom pos="0 0 0.019" mesh="link2" class="visual" />
+        <geom pos="0 0 0.019" mesh="link2" class="collision" />
+
+        <body name="right_link3" pos="0 0 0.0595">
+
+          <inertial pos="0.0103084 0.000377434 0.101702"
+            quat="0.71133 0.0466763 0.0513691 0.699423"
+            mass="0.138509"
+            diaginertia="0.000342915 0.000335932 5.49578e-05" />
+
+          <joint name="right_Joint2" class="Joint2" />
+
+          <geom mesh="link3" class="visual" />
+          <geom mesh="link3" class="collision" />
+
+          <body name="right_link4" pos="0.024 0 0.128">
+
+            <inertial pos="0.0909096 0.000389298 0.000224133"
+              quat="-0.00162881 0.706672 0.0026348 0.707535"
+              mass="0.132746"
+              diaginertia="0.000251551 0.000242311 3.06462e-05" />
+
+            <joint name="right_Joint3" class="Joint3" />
+
+            <geom mesh="link4" class="visual" />
+            <geom mesh="link4" class="collision" />
+
+            <body name="right_link5" pos="0.124 0 0">
+
+              <inertial pos="0.0442068 3.684e-07 0.00891422"
+                quat="0.479052 0.479052 -0.520105 0.520105"
+                mass="0.143276"
+                diaginertia="9.3211e-05 8.07871e-05 7.59805e-05" />
+
+              <joint name="right_Joint4" class="Joint4" />
+
+              <geom mesh="link5" class="visual" />
+              <geom mesh="link5" class="collision" />
+
+              <!-- Grasp frame -->
+              <site name="right_grasp_frame"
+                pos="0.100 0 0"
+                quat="1 0 0 0"
+                size="0.002"
+                rgba="0 1 0 0.5" />
+
+              <!-- LEFT GRIPPER -->
+              <body name="right_gripper_left"
+                pos="0.0817 0.021 0">
+
+                <inertial pos="0 0 0"
+                  mass="0.001"
+                  diaginertia="1e-06 1e-06 1e-06" />
+
+                <joint name="right_Gripper"
+                  class="Gripper" />
+
+                <geom mesh="gripper_left_palm" class="visual" />
+                <geom mesh="gripper_left_palm" class="collision" />
+
+              </body>
+
+              <!-- RIGHT GRIPPER -->
+              <body name="right_gripper_right"
+                pos="0.0817 -0.021 0">
+
+                <inertial pos="0 0 0"
+                  mass="0.001"
+                  diaginertia="1e-06 1e-06 1e-06" />
+
+                <joint name="right_Gripper_mimic"
+                  class="Gripper_mimic" />
+
+                <geom mesh="gripper_right_palm" class="visual" />
+                <geom mesh="gripper_right_palm" class="collision" />
+
+              </body>
+
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position class="XM430" name="left_Joint1" joint="left_Joint1" inheritrange="1" />
+    <position class="XM430" name="left_Joint2" joint="left_Joint2" inheritrange="1" />
+    <position class="XM430" name="left_Joint3" joint="left_Joint3" inheritrange="1" />
+    <position class="XM430" name="left_Joint4" joint="left_Joint4" inheritrange="1" />
+    <position class="XL430" name="left_Gripper" joint="left_Gripper" inheritrange="1" />
+
+    <position class="XM430" name="right_Joint1" joint="right_Joint1" inheritrange="1" />
+    <position class="XM430" name="right_Joint2" joint="right_Joint2" inheritrange="1" />
+    <position class="XM430" name="right_Joint3" joint="right_Joint3" inheritrange="1" />
+    <position class="XM430" name="right_Joint4" joint="right_Joint4" inheritrange="1" />
+    <position class="XL430" name="right_Gripper" joint="right_Gripper" inheritrange="1" />
+  </actuator>
+
+  <contact>
+    <exclude body1="left_link1" body2="left_link2" />
+    <exclude body1="left_link5" body2="left_gripper_left" />
+    <exclude body1="left_link5" body2="left_gripper_right" />
+    <exclude body1="left_gripper_left" body2="left_gripper_right" />
+
+    <exclude body1="right_link1" body2="right_link2" />
+    <exclude body1="right_link5" body2="right_gripper_left" />
+    <exclude body1="right_link5" body2="right_gripper_right" />
+    <exclude body1="right_gripper_left" body2="right_gripper_right" />
+  </contact>
+
+  <equality>
+    <joint joint1="left_Gripper" joint2="left_Gripper_mimic" polycoef="0 1 0 0 0" />
+    <joint joint1="right_Gripper" joint2="right_Gripper_mimic" polycoef="0 1 0 0 0" />
+  </equality>
+</mujoco>

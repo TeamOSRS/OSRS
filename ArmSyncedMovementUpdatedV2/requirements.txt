@@ -1,0 +1,4 @@
+customtkinter>=5.2.0
+numpy>=1.20.0
+pyserial>=3.5
+dynamixel-sdk>=3.7.31

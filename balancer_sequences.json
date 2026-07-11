@@ -1,0 +1,76 @@
+[
+    {
+        "name": "Custom Arm Lift",
+        "steps": [
+            {
+                "delay": 10,
+                "modifications": {
+                    "L1P": 0,
+                    "R1P": 0,
+                    "Head Pitch (U/D)": 0
+                }
+            },
+            {
+                "delay": 25,
+                "modifications": {
+                    "L1P": 0,
+                    "R1P": 0,
+                    "L4F": 0,
+                    "L3Y": -500,
+                    "R3Y": 0
+                }
+            },
+            {
+                "delay": 20,
+                "modifications": {
+                    "L1P": 0,
+                    "R1P": 0,
+                    "L4F": 0,
+                    "L3Y": -500,
+                    "R3Y": 0,
+                    "Head Yaw (L/R)": 0,
+                    "Head Pitch (U/D)": 1094
+                }
+            }
+        ]
+    },
+    {
+        "name": "New Sequence 2",
+        "steps": [
+            {
+                "delay": 20,
+                "modifications": {
+                    "L3Y": 2048,
+                    "R3Y": 0
+                }
+            },
+            {
+                "delay": 20,
+                "modifications": {
+                    "L3Y": 2048,
+                    "R3Y": -2048
+                }
+            },
+            {
+                "delay": 20,
+                "modifications": {
+                    "L3Y": 2048,
+                    "R3Y": -2048,
+                    "L5Y": 1024,
+                    "R5Y": -1024
+                }
+            },
+            {
+                "delay": 20,
+                "modifications": {
+                    "L3Y": 2048,
+                    "R3Y": -2048,
+                    "L5Y": 1024,
+                    "R5Y": -1024,
+                    "R4F": 2560,
+                    "L4F": -2560
+                }
+            }
+        ]
+    }
+]

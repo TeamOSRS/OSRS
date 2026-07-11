@@ -1,0 +1,420 @@
+
+Requesting state for world [empty]...
+
+Model: [10]
+  - Name: dual_open_manipulator_x
+  - Pose [ XYZ (m) ] [ RPY (rad) ]:
+    [0.000000 0.000000 0.000000]
+    [0.000000 0.000000 -0.000000]
+  - Link [11]
+    - Name: front_cam_link
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.050000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000010 0.000000 0.000000]
+      [0.000000 0.000010 0.000000]
+      [0.000000 0.000000 0.000010]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.150000 -0.750000 0.300000]
+      [-0.000000 0.408959 1.771950]
+    - Sensor [13]
+      - Name: front_cam
+      - Parent: dual_open_manipulator_x [10]
+      - Pose [ XYZ (m) ] [ RPY (rad) ]:
+        [-0.000000 -0.000000 -0.000000]
+        [0.000000 -0.000000 0.000000]
+      - Horizontal field of view (rad): 0.785398
+      - Image width (px): 640
+      - Image height (px): 480
+      - Near clip (m): 0.02
+      - Far clip (m): 300
+      - Pixel format: RGB_INT8
+      - Save frames: 0
+      - Save frames path: 
+      - Image noise:
+        - Mean: 0
+        - Bias mean: 0
+        - Standard deviation: 0
+        - Bias standard deviation: 0
+        - Precision: 0
+        - Dynamic bias standard deviation: 0
+        - Dynamic bias correlation time (s): 0
+      - Distortion K1: 0
+      - Distortion K2: 0
+      - Distortion K3: 0
+      - Distortion P1: 0
+      - Distortion P2: 0
+      - Distortion center: 0.5 0.5
+      - Lens type: stereographic
+      - Lens scale to horizontal field of view (rad): 1
+      - Lens C1: 1
+      - Lens C2: 1
+      - Lens C3: 0
+      - Lens focal length (m): 1
+      - Lens function: tan
+      - Lens cutoff angle (rad): 1.5708
+      - Lens texture size: 256
+      - Lens intrinsics Fx: 277
+      - Lens intrinsics Fy: 277
+      - Lens intrinsics Cx: 160
+      - Lens intrinsics Cy: 120
+      - Lens intrinsics skew: 0
+      - Visibility mask: 4294967295
+  - Link [14]
+    - Name: left_link1
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.500000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.001000 0.000000 0.000000]
+      [0.000000 0.001000 0.000000]
+      [0.000000 0.000000 0.001000]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.460000 -0.000000 -0.000000]
+      [-0.000000 0.000000 0.000000]
+  - Link [17]
+    - Name: left_link2
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.100000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000100 0.000000 0.000000]
+      [0.000000 0.000100 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.448000 -0.000000 0.017000]
+      [-0.000000 0.000000 0.000000]
+  - Link [20]
+    - Name: left_link3
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.140000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000300 0.000000 0.000000]
+      [0.000000 0.000300 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.448000 -0.000000 0.076500]
+      [-0.000000 0.000005 0.000000]
+  - Link [23]
+    - Name: left_link4
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.130000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000200 0.000000 0.000000]
+      [0.000000 0.000200 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.423999 -0.000000 0.204500]
+      [-0.000000 0.000072 0.000000]
+  - Link [26]
+    - Name: left_link5
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.140000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000100 0.000000 0.000000]
+      [0.000000 0.000100 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.299999 -0.000000 0.204491]
+      [-0.000000 0.000002 0.000000]
+  - Link [29]
+    - Name: plate_assembly
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.130000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000031 0.000000 0.000000]
+      [0.000000 0.002200 0.000000]
+      [0.000000 0.000000 0.002200]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.075801 -0.000000 0.204490]
+      [-0.000000 0.000002 0.000000]
+  - Link [38]
+    - Name: right_link1
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.500000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.001000 0.000000 0.000000]
+      [0.000000 0.001000 0.000000]
+      [0.000000 0.000000 0.001000]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.460000 -0.000000 -0.000000]
+      [0.000000 0.000000 3.141590]
+  - Link [41]
+    - Name: right_link2
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.100000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000100 0.000000 0.000000]
+      [0.000000 0.000100 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.448000 0.000000 0.017000]
+      [0.000000 0.000000 3.141590]
+  - Link [44]
+    - Name: right_link3
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.140000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000300 0.000000 0.000000]
+      [0.000000 0.000300 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.448000 0.000000 0.076500]
+      [0.000000 0.000007 3.141590]
+  - Link [47]
+    - Name: right_link4
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.130000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000200 0.000000 0.000000]
+      [0.000000 0.000200 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.423999 0.000000 0.204500]
+      [0.000000 0.000071 3.141590]
+  - Link [50]
+    - Name: right_link5
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.140000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000100 0.000000 0.000000]
+      [0.000000 0.000100 0.000000]
+      [0.000000 0.000000 0.000100]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.299999 0.000000 0.204491]
+      [0.000000 0.000000 3.141590]
+  - Link [53]
+    - Name: top_cam_link
+    - Parent: dual_open_manipulator_x [10]
+    - Mass (kg): 0.050000
+    - Inertial Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Inertial Matrix (kg.m^2):
+      [0.000010 0.000000 0.000000]
+      [0.000000 0.000010 0.000000]
+      [0.000000 0.000000 0.000010]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.000000 -0.600000 0.800000]
+      [0.000000 0.643501 1.570800]
+    - Sensor [55]
+      - Name: top_cam
+      - Parent: dual_open_manipulator_x [10]
+      - Pose [ XYZ (m) ] [ RPY (rad) ]:
+        [-0.000000 -0.000000 -0.000000]
+        [0.000000 0.000000 0.000000]
+      - Horizontal field of view (rad): 0.785398
+      - Image width (px): 640
+      - Image height (px): 480
+      - Near clip (m): 0.02
+      - Far clip (m): 300
+      - Pixel format: RGB_INT8
+      - Save frames: 0
+      - Save frames path: 
+      - Image noise:
+        - Mean: 0
+        - Bias mean: 0
+        - Standard deviation: 0
+        - Bias standard deviation: 0
+        - Precision: 0
+        - Dynamic bias standard deviation: 0
+        - Dynamic bias correlation time (s): 0
+      - Distortion K1: 0
+      - Distortion K2: 0
+      - Distortion K3: 0
+      - Distortion P1: 0
+      - Distortion P2: 0
+      - Distortion center: 0.5 0.5
+      - Lens type: stereographic
+      - Lens scale to horizontal field of view (rad): 1
+      - Lens C1: 1
+      - Lens C2: 1
+      - Lens C3: 0
+      - Lens focal length (m): 1
+      - Lens function: tan
+      - Lens cutoff angle (rad): 1.5708
+      - Lens texture size: 256
+      - Lens intrinsics Fx: 277
+      - Lens intrinsics Fy: 277
+      - Lens intrinsics Cx: 160
+      - Lens intrinsics Cy: 120
+      - Lens intrinsics skew: 0
+      - Visibility mask: 4294967295
+  - Joint [56]
+    - Name: front_cam_joint
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: world
+    - Child Link: front_cam_link [11]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.000000 -0.000000 -0.000000]
+      [0.000000 -0.000000 0.000000]
+  - Joint [57]
+    - Name: left_base_joint
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: world
+    - Child Link: left_link1 [14]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+  - Joint [58]
+    - Name: left_Joint1
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: left_link1 [14]
+    - Child Link: left_link2 [17]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 0 1]
+  - Joint [59]
+    - Name: left_Joint2
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: left_link2 [17]
+    - Child Link: left_link3 [20]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [60]
+    - Name: left_Joint3
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: left_link3 [20]
+    - Child Link: left_link4 [23]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [61]
+    - Name: left_Joint4
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: left_link4 [23]
+    - Child Link: left_link5 [26]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [62]
+    - Name: plate_joint
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: left_link5 [26]
+    - Child Link: plate_assembly [29]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 0 1]
+  - Joint [63]
+    - Name: right_base_joint
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: world
+    - Child Link: right_link1 [38]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+  - Joint [64]
+    - Name: right_Joint1
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: right_link1 [38]
+    - Child Link: right_link2 [41]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 0 1]
+  - Joint [65]
+    - Name: right_Joint2
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: right_link2 [41]
+    - Child Link: right_link3 [44]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [66]
+    - Name: right_Joint3
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: right_link3 [44]
+    - Child Link: right_link4 [47]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [67]
+    - Name: right_Joint4
+    - Parent: dual_open_manipulator_x [10]
+    - Type: revolute
+    - Parent Link: right_link4 [47]
+    - Child Link: right_link5 [50]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]
+    - Axis unit vector [ XYZ ]:
+      [0 1 0]
+  - Joint [68]
+    - Name: top_cam_joint
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: world
+    - Child Link: top_cam_link [53]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [-0.000000 -0.000000 -0.000000]
+      [0.000000 0.000000 0.000000]
+  - Joint [69]
+    - Name: right_weld
+    - Parent: dual_open_manipulator_x [10]
+    - Type: fixed
+    - Parent Link: right_link5 [50]
+    - Child Link: plate_assembly [29]
+    - Pose [ XYZ (m) ] [ RPY (rad) ]:
+      [0.000000 0.000000 0.000000]
+      [0.000000 -0.000000 0.000000]

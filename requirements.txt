@@ -1,0 +1,7 @@
+numpy
+opencv-python
+mediapipe
+dynamixel_sdk
+fastapi
+uvicorn
+websockets

@@ -1,0 +1,356 @@
+{
+    "V1": {
+        "0": {
+            "name": "Index Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "1": {
+            "name": "Index MCP",
+            "min": 2048,
+            "max": 3000,
+            "default": 2048
+        },
+        "2": {
+            "name": "Index PIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "3": {
+            "name": "Ring MCP",
+            "min": 2048,
+            "max": 3000,
+            "default": 2048
+        },
+        "4": {
+            "name": "Middle Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "5": {
+            "name": "Middle MCP",
+            "min": 2048,
+            "max": 3000,
+            "default": 2048
+        },
+        "6": {
+            "name": "Middle PIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "7": {
+            "name": "Middle DIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "8": {
+            "name": "Ring Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "9": {
+            "name": "Index DIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "10": {
+            "name": "Ring PIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "11": {
+            "name": "Ring DIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "12": {
+            "name": "Thumb Abduct",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "13": {
+            "name": "Thumb MCP",
+            "min": 2048,
+            "max": 3000,
+            "default": 2048
+        },
+        "14": {
+            "name": "Thumb PIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "15": {
+            "name": "Thumb DIP",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        }
+    },
+    "V2": {
+        "0": {
+            "name": "Index Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "1": {
+            "name": "Index Curl",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "2": {
+            "name": "Middle Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "3": {
+            "name": "Middle Curl",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "4": {
+            "name": "Ring Abduct",
+            "min": 2048,
+            "max": 2500,
+            "default": 2048
+        },
+        "5": {
+            "name": "Ring Curl",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "6": {
+            "name": "Thumb Abduct",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        },
+        "7": {
+            "name": "Thumb Curl",
+            "min": 2048,
+            "max": 3200,
+            "default": 2048
+        }
+    },
+    "Humanoid V1": {
+        "21": {
+            "name": "L1P",
+            "min": -7657,
+            "max": 535,
+            "default": -3561
+        },
+        "12": {
+            "name": "L2R",
+            "min": -4258,
+            "max": 3934,
+            "default": -162
+        },
+        "13": {
+            "name": "L3Y",
+            "min": 248,
+            "max": 8440,
+            "default": 4344
+        },
+        "24": {
+            "name": "L4F",
+            "min": -3284,
+            "max": 4908,
+            "default": 812
+        },
+        "25": {
+            "name": "L5Y",
+            "min": -3153,
+            "max": 5039,
+            "default": 943
+        },
+        "26": {
+            "name": "L6R",
+            "min": -4075,
+            "max": 4117,
+            "default": 21
+        },
+        "27": {
+            "name": "L7P",
+            "min": -4036,
+            "max": 4156,
+            "default": 60
+        },
+        "28": {
+            "name": "L8G",
+            "min": -6772,
+            "max": 1420,
+            "default": -2676
+        },
+        "11": {
+            "name": "R1P",
+            "min": -5770,
+            "max": 2422,
+            "default": -1674
+        },
+        "22": {
+            "name": "R2R",
+            "min": -1958,
+            "max": 6234,
+            "default": 2138
+        },
+        "23": {
+            "name": "R3Y",
+            "min": -5371,
+            "max": 2821,
+            "default": -1275
+        },
+        "14": {
+            "name": "R4F",
+            "min": -58,
+            "max": 8134,
+            "default": 4038
+        },
+        "15": {
+            "name": "R5Y",
+            "min": -5091,
+            "max": 3101,
+            "default": -995
+        },
+        "16": {
+            "name": "R6R",
+            "min": -19,
+            "max": 8173,
+            "default": 4077
+        },
+        "17": {
+            "name": "R7P",
+            "min": -4022,
+            "max": 4170,
+            "default": 74
+        },
+        "18": {
+            "name": "R8G",
+            "min": -3113,
+            "max": 5079,
+            "default": 983
+        },
+        "31": {
+            "name": "Head Yaw (L/R)",
+            "min": -4096,
+            "max": 4096,
+            "default": 0
+        },
+        "32": {
+            "name": "Head Pitch (U/D)",
+            "min": -4096,
+            "max": 4096,
+            "default": 0
+        }
+    },
+    "Open Manipulator X": {
+        "11": {
+            "name": "Joint 1 - Yaw",
+            "min": 0,
+            "max": 4095,
+            "default": 2048
+        },
+        "12": {
+            "name": "Joint 2 - Shoulder",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "13": {
+            "name": "Joint 3 - Elbow",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "14": {
+            "name": "Joint 4 - Wrist",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "15": {
+            "name": "Joint 5 - Gripper",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        }
+    },
+    "Rover Bot": {
+        "41": {
+            "name": "L Front Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "42": {
+            "name": "L Mid Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "43": {
+            "name": "L Rear Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "44": {
+            "name": "R Front Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "45": {
+            "name": "R Mid Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "46": {
+            "name": "R Rear Drive",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        }
+    },
+    "Custom Platform": {
+        "51": {
+            "name": "Aux Joint 1",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "52": {
+            "name": "Aux Joint 2",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "53": {
+            "name": "Aux Joint 3",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        },
+        "54": {
+            "name": "Aux Joint 4",
+            "min": 1024,
+            "max": 3072,
+            "default": 2048
+        }
+    }
+}
