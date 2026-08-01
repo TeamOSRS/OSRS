@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
-  Wifi, WifiOff, AlertTriangle, Settings, Sliders, Activity, Plus, Trash2, Repeat, Play, StopCircle, RefreshCw, Cpu, Wrench, Video, Terminal, Eye, Save, PlusCircle, Trash, Bell, Search, Home, HelpCircle, Keyboard, BookOpen, Bot, Network, TrendingUp, Database
+  Wifi, WifiOff, AlertTriangle, Settings, Sliders, Activity, Plus, Trash2, Repeat, Play, StopCircle, RefreshCw, Cpu, Wrench, Video, Terminal, Eye, Save, PlusCircle, Trash, Bell, Search, Home, HelpCircle, Keyboard, BookOpen, Bot, Network, TrendingUp, Database, Info, Globe, ExternalLink
 } from "lucide-react";
 
-import DigitalTwinViewer from "./components/DigitalTwinViewer";
 import DataflowWorkspace from "./components/DataflowWorkspace";
 import BallBalancerResearch from "./components/BallBalancerResearch";
 import DataRecorder from "./components/DataRecorder";
+
+const BAUDRATE_OPTIONS = [
+  { value: 4000000, label: "4M bps" },
+  { value: 1000000, label: "1M bps" },
+  { value: 115200, label: "115200 bps" },
+  { value: 57600, label: "57600 bps" }
+];
 
 const PRESET_EMOTE_FRAMES = {
   "HI Left": [
@@ -115,6 +121,24 @@ export default function App() {
 
   // System logs
   const [logs, setLogs] = useState([]);
+  const [pauseLogs, setPauseLogsState] = useState(false);
+  const pauseLogsRef = useRef(false);
+  const [clearOffset, setClearOffset] = useState(0);
+
+  const setPauseLogs = (val) => {
+    pauseLogsRef.current = val;
+    setPauseLogsState(val);
+  };
+
+  const handleClearLogs = () => {
+    setClearOffset(logs.length);
+  };
+
+  const handleCopyLogs = () => {
+    const visibleLogs = logs.slice(clearOffset);
+    const text = visibleLogs.join("\n");
+    navigator.clipboard.writeText(text);
+  };
 
   // Local drag/input state for sliders to prevent lag
   const [localDrags, setLocalDrags] = useState({});
@@ -147,10 +171,81 @@ export default function App() {
   const [playingPreset, setPlayingPreset] = useState(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
+  const connectionDropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showConnectionDropdown && connectionDropdownRef.current && !connectionDropdownRef.current.contains(event.target)) {
+        setShowConnectionDropdown(false);
+      }
+      if (showProfileDropdown && profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showConnectionDropdown, showProfileDropdown]);
+
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashFade, setSplashFade] = useState(false);
+  const [splashProgress, setSplashProgress] = useState(0);
+  const [splashMsg, setSplashMsg] = useState("Initializing core modules...");
+
+  useEffect(() => {
+    const messages = [
+      "Detecting hardware nodes...",
+      "Syncing Dynamixel motor bus...",
+      "Initializing perception pipelines...",
+      "Calibrating system parameters...",
+      "Awaiting telemetry link...",
+      "Ready!"
+    ];
+    
+    let msgIndex = 0;
+    const msgInterval = setInterval(() => {
+      if (msgIndex < messages.length - 1) {
+        setSplashMsg(messages[msgIndex]);
+        msgIndex++;
+      }
+    }, 350);
+
+    const progressInterval = setInterval(() => {
+      setSplashProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 4;
+      });
+    }, 80);
+
+    const fadeTimer = setTimeout(() => {
+      setSplashFade(true);
+    }, 2200);
+
+    const removeTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2900);
+
+    return () => {
+      clearInterval(msgInterval);
+      clearInterval(progressInterval);
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
+
   // New Modular Workspace States
   const [digitalTwin, setDigitalTwin] = useState({ sync_mode: "hardware", joints: {}, model_geometry: {} });
   const [balancer, setBalancer] = useState({ is_active: false, data: {}, kp: 0.8, kd: 0.3, ki: 0.05, provider: "vision" });
   const [recorder, setRecorder] = useState({ is_recording: false, recorded_frames: 0, is_replaying: false });
+  const [manualSearch, setManualSearch] = useState("");
+  const [expandedSection, setExpandedSection] = useState("overview");
+  const [showBaudDropdownHeader, setShowBaudDropdownHeader] = useState(false);
+  const [showBaudDropdownDashboard, setShowBaudDropdownDashboard] = useState(false);
 
   const ws = useRef(null);
   const logEndRef = useRef(null);
@@ -237,7 +332,7 @@ export default function App() {
         setCameraActive(data.camera_active);
         setCameraIdx(data.camera_index);
         setTrackingEnabled(data.tracking_enabled);
-        if (data.logs) setLogs(data.logs);
+        if (data.logs && !pauseLogsRef.current) setLogs(data.logs);
         
         // Fetch mirror sync state on status reload
         try {
@@ -374,7 +469,7 @@ export default function App() {
           }
           if (data.system) setSystemStats(data.system);
           if (data.calibration) setCalibrationState(data.calibration);
-          if (data.logs) setLogs(data.logs);
+          if (data.logs && !pauseLogsRef.current) setLogs(data.logs);
           if (data.video_frame !== undefined) setVideoFrame(data.video_frame);
           
           if (data.digital_twin) setDigitalTwin(data.digital_twin);
@@ -1105,32 +1200,71 @@ export default function App() {
   const isAnyTorqueActive = Object.values(telemetry).some(t => t.torque === true);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#EAEDF1] text-[#1E2022] select-none pt-10 font-sans">
-      
-      {/* FIXED TOP BAR (sticky top panel) */}
-      <div className="fixed top-0 left-0 right-0 h-10 bg-[#191A1B]/95 backdrop-blur-md border-b border-slate-800 text-[11px] font-medium text-slate-300 flex items-center justify-between px-4 z-50 shadow-sm select-none font-sans">
-        
-        {/* Left: Brand/Logo & View selector & Platform dropdown */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <Activity className="h-3.5 w-3.5 text-[#CFFF3E] animate-pulse" />
-            <span className="font-bold text-[11px] tracking-widest text-[#CFFF3E] uppercase">OSRS</span>
+    <>
+      {showSplash && (
+        <div className={`fixed inset-0 bg-[#1F150C] z-[9999] flex flex-col items-center justify-center font-sans select-none overflow-hidden transition-all duration-700 ease-in-out ${splashFade ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"}`}>
+          {/* Radial ambient glow */}
+          <div className="absolute w-[500px] h-[500px] rounded-full bg-[#E1DCC9]/8 blur-[120px] pointer-events-none" />
+          
+          {/* Glowing emblem */}
+          <div className="relative flex items-center justify-center w-28 h-28 mb-6">
+            <div className="absolute inset-0 rounded-full border border-dashed border-[#E1DCC9]/25 animate-spin" style={{ animationDuration: "16s" }} />
+            <div className="absolute inset-2 rounded-full border border-[#E1DCC9]/15 animate-spin" style={{ animationDuration: "12s", animationDirection: "reverse" }} />
+            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#E1DCC9] to-white flex items-center justify-center shadow-[0_0_55px_rgba(225,220,201,0.25)] border border-[#E1DCC9]/30">
+              <Activity className="h-7 w-7 text-[#1F150C] animate-pulse" />
+            </div>
           </div>
-          <span className="text-slate-700">|</span>
-          <span className="bg-white/10 text-[#B5ACF3] px-2 py-0.5 rounded-md font-semibold text-[9px] uppercase tracking-wider">
+          
+          {/* Logo Title */}
+          <h1 className="text-4xl font-black tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-white via-[#E1DCC9] to-white select-none uppercase">OSRS</h1>
+          <p className="text-[9px] uppercase font-black tracking-[0.5em] text-[#E1DCC9]/60 mt-2.5">Open Source Robotics Suite</p>
+          
+          {/* Progress Bar & Boot Logs */}
+          <div className="flex flex-col items-center gap-2 mt-10">
+            <div className="w-48 bg-[#412D15]/40 h-1 rounded-full overflow-hidden border border-[#412D15]/30 relative">
+              <div className="bg-gradient-to-r from-[#E1DCC9] to-white h-full rounded-full transition-all duration-150" style={{ width: `${splashProgress}%` }} />
+            </div>
+            <div className="flex justify-between items-center w-48 text-[9px] font-bold text-[#E1DCC9]/60 uppercase tracking-wider font-mono">
+              <span className="truncate max-w-[120px]">{splashMsg}</span>
+              <span>{splashProgress}%</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col min-h-screen bg-[#E1DCC9] text-[#1E2022] select-none pt-14 font-sans">
+      
+      {/* REDESIGNED FLOATING GLASSMORPHIC TOP BAR */}
+      <div className="fixed top-0 left-0 right-0 h-14 bg-[#1F150C]/90 backdrop-blur-lg border-b border-[#412D15]/40 text-xs font-semibold text-slate-300 flex items-center justify-between px-6 z-50 shadow-lg select-none font-sans transition-all duration-300">
+        
+        {/* Left: OSRS Brand Badge & Sub-View Indicator & Custom Bot Dropdown */}
+        <div className="flex items-center gap-4">
+          {/* Logo Badge */}
+          <div className="flex items-center gap-2 bg-[#412D15]/30 hover:bg-[#412D15]/45 border border-[#412D15]/45 hover:border-[#412D15]/65 px-3 py-1.5 rounded-full shadow-inner transition-all duration-300">
+            <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-[#E1DCC9] to-[#412D15] flex items-center justify-center shadow-lg shadow-[rgba(225,220,201,0.2)]">
+              <Activity className="h-3 w-3 text-[#1F150C] animate-pulse" />
+            </div>
+            <span className="font-black text-xs tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-[#E1DCC9] to-[#412D15] uppercase select-none">OSRS</span>
+          </div>
+
+          <span className="text-slate-800 font-light">/</span>
+
+          {/* Active View Label */}
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#E1DCC9]/80 bg-[#412D15]/30 border border-[#412D15]/40 px-2.5 py-1.5 rounded-lg select-none">
             {activeTab === "emotemaker" ? "Emotes & Maker" : activeTab === "cadmapper" ? "CAD ID Mapper" : activeTab.toUpperCase()}
           </span>
-          <span className="text-slate-700">|</span>
-          
-          {/* Custom Bot Selector Dropdown */}
-          <div className="relative">
+
+          <span className="text-slate-800 font-light">/</span>
+
+          {/* Platform Selector Dropdown */}
+          <div className="relative" ref={profileDropdownRef}>
             <button
               onClick={() => setShowProfileDropdown(prev => !prev)}
-              className="flex items-center gap-1.5 text-slate-300 hover:text-white transition font-medium"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#000000]/40 hover:bg-[#412D15]/85 text-[#E1DCC9]/90 hover:text-white transition-all duration-300 border border-[#412D15]/35 hover:border-[#412D15]/65 shadow-sm active:scale-[0.98]"
             >
-              <Bot className="h-3.5 w-3.5 text-[#B5ACF3]" />
-              <span className="uppercase tracking-wider">{handVersion}</span>
-              <span className="text-[7px] text-slate-500">▼</span>
+              <Bot className="h-3.5 w-3.5 text-[#E1DCC9]" />
+              <span className="font-semibold text-xs tracking-wide uppercase">{handVersion}</span>
+              <span className={`text-[6px] text-slate-500 transition-transform duration-300 ${showProfileDropdown ? "rotate-180" : ""}`}>▼</span>
             </button>
 
             {showProfileDropdown && (
@@ -1140,14 +1274,12 @@ export default function App() {
                   onClick={() => setShowProfileDropdown(false)} 
                 />
                 
-                <div className="absolute left-0 mt-2 bg-[#1E2022] rounded-2xl shadow-2xl border border-slate-700/50 p-2.5 z-50 w-72 animate-in fade-in slide-in-from-top-3 duration-200 flex flex-col gap-1 text-white font-sans">
-                  <span className="text-[9px] font-semibold text-[#7E8B93] uppercase tracking-wider px-3.5 py-1.5 block border-b border-slate-800">Select Active Platform</span>
+                <div className="absolute left-0 mt-3 bg-[#1F150C]/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-[#412D15]/50 p-2.5 z-50 w-72 animate-in fade-in slide-in-from-top-2 duration-200 flex flex-col gap-1 text-white font-sans">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-3.5 py-2 block border-b border-[#412D15]/50">Select Active Platform</span>
                   {[
                     { value: "Humanoid V1", desc: "16-Axis Humanoid Rig", nodes: "16 Nodes" },
                     { value: "Open Manipulator X", desc: "5-Axis Robotic Arm", nodes: "5 Nodes" },
-                    { value: "V1", label: "LEAP Hand V1", desc: "16-Motor Biomimetic Hand", nodes: "16 Nodes" },
-                    { value: "V2", label: "LEAP Hand V2", desc: "8-Motor Biomimetic Hand", nodes: "8 Nodes" },
-                    { value: "Rover Bot", desc: "6-Wheel Drive Autonomous Rover", nodes: "6 Nodes" }
+                    { value: "V1", label: "LEAP Hand V1", desc: "16-Motor Biomimetic Hand", nodes: "16 Nodes" }
                   ].map((item) => {
                     const isSelected = handVersion === item.value;
                     const displayName = item.label || item.value;
@@ -1158,17 +1290,17 @@ export default function App() {
                           changeProfile(item.value);
                           setShowProfileDropdown(false);
                         }}
-                        className={`w-full text-left px-3.5 py-2.5 rounded-xl flex items-center justify-between transition ${
+                        className={`w-full text-left px-3.5 py-2.5 rounded-xl flex items-center justify-between transition-all duration-200 ${
                           isSelected 
-                            ? "bg-[#CFFF3E]/10 text-[#CFFF3E] font-bold border-l-4 border-[#CFFF3E]" 
-                            : "hover:bg-white/5 text-slate-450 hover:text-white font-medium"
+                            ? "bg-[#E1DCC9]/10 text-[#E1DCC9] font-bold border-l-2 border-[#E1DCC9]" 
+                            : "hover:bg-[#412D15]/35 text-[#E1DCC9]/70 hover:text-white font-medium"
                         }`}
                       >
                         <div className="flex flex-col gap-0.5">
                           <span className="text-xs">{displayName}</span>
-                          <span className="text-[9px] text-slate-500 font-medium">{item.desc}</span>
+                          <span className="text-[9px] text-slate-555 font-medium">{item.desc}</span>
                         </div>
-                        <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${isSelected ? "bg-[#CFFF3E]/20 text-[#CFFF3E]" : "bg-slate-800 text-slate-500"}`}>
+                        <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${isSelected ? "bg-[#E1DCC9]/20 text-[#E1DCC9]" : "bg-[#412D15] text-[#E1DCC9]/60"}`}>
                           {item.nodes}
                         </span>
                       </button>
@@ -1180,22 +1312,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* Center: Live Clock & Connection Pill with wifi dropdown manager */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3 font-sans font-medium text-slate-200 tracking-wide">
-          <span>{currentTime.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}  {currentTime.toLocaleTimeString("en-US", { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })}</span>
-          
+        {/* Center: Live Connection Telemetry Pill */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center" ref={connectionDropdownRef}>
           <div className="relative">
             <button
               onClick={() => setShowConnectionDropdown(prev => !prev)}
-              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide transition border ${
+              className={`inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest transition-all duration-300 border backdrop-blur-sm shadow-lg active:scale-95 ${
                 connected 
-                  ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" 
-                  : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                  ? "bg-[#E1DCC9]/10 text-[#E1DCC9] border-[#E1DCC9]/30 hover:bg-[#E1DCC9]/20 shadow-[0_0_15px_rgba(225,220,201,0.15)]" 
+                  : "bg-rose-500/10 text-rose-300 border-rose-500/30 hover:bg-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
               }`}
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-green-400 animate-pulse" : "bg-red-400"}`} />
-              <span>{connected ? (mockMode ? "MOCK" : "LIVE") : "OFFLINE"}</span>
-              <span className="text-[6px] text-slate-400">▼</span>
+              <span className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-emerald-450 animate-ping" : "bg-rose-450"}`} />
+              <span>{connected ? (mockMode ? "MOCK TELEMETRY" : "LIVE TELEMETRY") : "CONTROLLER OFFLINE"}</span>
+              <span className="text-[6px] text-[#E1DCC9]/60">▼</span>
             </button>
 
             {showConnectionDropdown && (
@@ -1205,27 +1335,27 @@ export default function App() {
                   onClick={() => setShowConnectionDropdown(false)} 
                 />
                 
-                <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-[#1E2022] rounded-2xl shadow-2xl border border-slate-700/60 p-5 z-50 w-64 text-white flex flex-col gap-4 font-sans animate-in fade-in slide-in-from-top-3 duration-200">
-                  <span className="text-[10px] font-bold text-[#7E8B93] uppercase tracking-widest block border-b border-slate-800 pb-2 mb-1 font-sans">Connection Manager</span>
+                <div className="absolute left-1/2 transform -translate-x-1/2 mt-3 bg-[#1F150C]/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-[#412D15]/50 p-5 z-50 w-72 text-white flex flex-col gap-4 font-sans animate-in fade-in slide-in-from-top-2 duration-200">
+                  <span className="text-[10px] font-bold text-[#E1DCC9]/80 uppercase tracking-widest block border-b border-[#412D15]/50 pb-2 mb-1">Connection Manager</span>
                   
                   {connected ? (
                     <div className="space-y-4">
                       <div className="text-[10px] font-semibold space-y-2">
                         <div className="flex justify-between items-center text-slate-400">
                           <span>Status:</span>
-                          <span className="text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded">CONNECTED</span>
+                          <span className="text-emerald-400 font-bold bg-emerald-500/20 px-2.5 py-0.5 rounded">CONNECTED</span>
                         </div>
                         <div className="flex justify-between items-center text-slate-400">
                           <span>Port:</span>
-                          <span className="text-white font-mono bg-white/5 px-2 py-0.5 rounded">{port}</span>
+                          <span className="text-white font-mono bg-[#412D15]/30 px-2.5 py-0.5 rounded">{port}</span>
                         </div>
                         <div className="flex justify-between items-center text-slate-400">
                           <span>Baudrate:</span>
-                          <span className="text-white font-mono bg-white/5 px-2 py-0.5 rounded">{baudrate / 1000000}M bps</span>
+                          <span className="text-white font-mono bg-[#412D15]/30 px-2.5 py-0.5 rounded">{baudrate / 1000000}M bps</span>
                         </div>
                         <div className="flex justify-between items-center text-slate-400">
                           <span>Mock Mode:</span>
-                          <span className="text-white bg-white/5 px-2 py-0.5 rounded">{mockMode ? "ACTIVE" : "OFF"}</span>
+                          <span className="text-white bg-[#412D15]/30 px-2.5 py-0.5 rounded">{mockMode ? "ACTIVE" : "OFF"}</span>
                         </div>
                       </div>
 
@@ -1234,7 +1364,7 @@ export default function App() {
                           triggerDisconnect();
                           setShowConnectionDropdown(false);
                         }}
-                        className="w-full bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-bold text-xs py-2.5 rounded-xl transition-all uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-red-500/10"
+                        className="w-full bg-red-600 hover:bg-red-750 active:scale-[0.98] text-white font-bold text-xs py-2.5 rounded-xl transition-all uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-red-500/10"
                       >
                         Disconnect Bus
                       </button>
@@ -1249,22 +1379,50 @@ export default function App() {
                             value={connPort}
                             onChange={(e) => setConnPort(e.target.value)}
                             placeholder="COM14"
-                            className="w-full bg-[#161718] border border-slate-700 hover:border-slate-600 focus:border-[#B5ACF3] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#B5ACF3] transition-all"
+                            className="w-full bg-[#000000]/40 border border-[#412D15]/50 hover:border-[#412D15]/85 focus:border-[#E1DCC9] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#E1DCC9] transition-all"
                           />
                         </div>
                         
-                        <div className="space-y-1.5">
+                        <div className="space-y-1.5 relative">
                           <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Baudrate</label>
-                          <select
-                            value={connBaud}
-                            onChange={(e) => setConnBaud(parseInt(e.target.value))}
-                            className="w-full bg-[#161718] border border-slate-700 hover:border-slate-600 focus:border-[#B5ACF3] rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none cursor-pointer transition-all"
+                          <button
+                            type="button"
+                            onClick={() => setShowBaudDropdownHeader(!showBaudDropdownHeader)}
+                            className="bg-[#000000]/40 border border-[#412D15]/50 hover:border-[#412D15]/85 focus:border-[#E1DCC9] rounded-lg px-3 py-2 text-xs text-white flex items-center justify-between cursor-pointer w-full transition-all h-[32px]"
                           >
-                            <option value={4000000}>4M bps</option>
-                            <option value={1000000}>1M bps</option>
-                            <option value={115200}>115200 bps</option>
-                            <option value={57600}>57600 bps</option>
-                          </select>
+                            <span>{BAUDRATE_OPTIONS.find(o => o.value === connBaud)?.label || "Select speed"}</span>
+                            <svg className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showBaudDropdownHeader ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+
+                          {showBaudDropdownHeader && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-40" 
+                                onClick={() => setShowBaudDropdownHeader(false)} 
+                              />
+                              <div className="absolute left-0 right-0 mt-1 bg-[#1F150C] rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-[#412D15]/50 p-1 z-50 flex flex-col gap-0.5 text-white font-sans animate-in fade-in slide-in-from-top-2 duration-150">
+                                {BAUDRATE_OPTIONS.map((opt) => (
+                                  <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                      setConnBaud(opt.value);
+                                      setShowBaudDropdownHeader(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 rounded-md text-xs font-bold transition-all duration-150 ${
+                                      connBaud === opt.value 
+                                        ? "bg-[#E1DCC9] text-[#1F150C]" 
+                                        : "hover:bg-[#412D15]/65 text-[#E1DCC9]/90 hover:text-white"
+                                    }`}
+                                  >
+                                    {opt.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
                         </div>
 
                         <label className="flex items-center gap-2.5 font-semibold text-slate-300 hover:text-white cursor-pointer pt-2 transition-colors">
@@ -1272,7 +1430,7 @@ export default function App() {
                             type="checkbox"
                             checked={connMock}
                             onChange={(e) => setConnMock(e.target.checked)}
-                            className="rounded text-[#CFFF3E] bg-[#161718] border-slate-700 w-4 h-4 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none transition-colors"
+                            className="rounded text-[#E1DCC9] bg-[#000000]/40 border-[#412D15]/50 w-4 h-4 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none transition-colors"
                           />
                           <span className="text-[10px]">Enable Mock Mode</span>
                         </label>
@@ -1283,7 +1441,7 @@ export default function App() {
                           triggerConnect();
                           setShowConnectionDropdown(false);
                         }}
-                        className="w-full bg-[#CFFF3E] text-[#1E2022] hover:bg-[#bce634] active:scale-[0.98] font-bold text-xs py-2.5 rounded-xl transition-all uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-[#CFFF3E]/10"
+                        className="w-full bg-[#E1DCC9] text-[#1F150C] hover:bg-[#E1DCC9]/90 active:scale-[0.98] font-bold text-xs py-2.5 rounded-xl transition-all uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-[#E1DCC9]/10"
                       >
                         Connect Bus
                       </button>
@@ -1295,88 +1453,62 @@ export default function App() {
           </div>
         </div>
 
-        {/* Right: Telemetry Mini-status, Torque Toggle, Shortcuts, E-Stop, Profile avatar */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 text-slate-400 font-sans font-medium">
-            <div className="flex items-center gap-1">
-              <Cpu className="w-3.5 h-3.5 text-[#B5ACF3]" />
-              <span>CPU: <span className="text-white font-medium">{systemStats.cpu}%</span></span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Activity className="w-3.5 h-3.5 text-[#CFFF3E]" />
-              <span>LATENCY: <span className="text-white font-medium">{systemStats.latency}ms</span></span>
-            </div>
-          </div>
-          <span className="text-slate-700">|</span>
-          
+        {/* Right: Premium Interactive Control Deck */}
+        <div className="flex items-center gap-2 bg-[#000000]/40 p-1 rounded-full border border-[#412D15]/40 shadow-inner">
           {/* Torque Global Toggle Button */}
           <button
             onClick={() => toggleTorqueGlobal(!isAnyTorqueActive)}
             disabled={!connected}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition ${
-              !connected ? "opacity-40 cursor-not-allowed bg-slate-800 text-slate-500" :
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 active:scale-[0.96] ${
+              !connected ? "opacity-30 cursor-not-allowed text-slate-600" :
               isAnyTorqueActive 
-                ? "bg-[#CFFF3E]/20 text-[#CFFF3E] border border-[#CFFF3E]/30" 
-                : "bg-slate-800 text-slate-450 hover:bg-slate-700 hover:text-white"
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:bg-emerald-500/30" 
+                : "bg-[#1F150C] text-[#E1DCC9]/70 border border-[#412D15]/40 hover:text-white hover:bg-[#412D15]"
             }`}
             title={isAnyTorqueActive ? "Click to release torque globally" : "Click to enable torque globally"}
           >
-            <Cpu className="h-3 w-3" />
+            <Cpu className="h-3.5 w-3.5" />
             <span>Torque {isAnyTorqueActive ? "ON" : "OFF"}</span>
           </button>
           
-          <span className="text-slate-700">|</span>
-
           {/* Shortcuts Guide Button */}
           <button
             onClick={() => setShowShortcutHelp(true)}
-            className="flex items-center gap-1 text-slate-400 hover:text-white transition font-medium"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider text-[#E1DCC9]/80 hover:text-white transition-all duration-300 hover:bg-[#412D15]/40"
             title="How to Use & Keyboard Shortcuts (Alt+H)"
           >
             <HelpCircle className="h-3.5 w-3.5 text-[#B5ACF3]" />
-            <span className="uppercase tracking-wider">GUIDE</span>
+            <span>GUIDE</span>
           </button>
           
-          <span className="text-slate-700">|</span>
-
           {/* E-Stop Indicator/Toggle */}
           <button
             onClick={toggleEstop}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 active:scale-[0.96] ${
               estopActive 
-                ? "bg-red-650 text-white animate-pulse" 
-                : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white"
+                ? "bg-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-400" 
+                : "bg-red-950/40 text-red-400 border border-red-950/80 hover:bg-red-900/40 hover:text-red-300"
             }`}
             title="Alt+S to toggle emergency stop"
           >
-            <AlertTriangle className="h-3 w-3" />
+            <AlertTriangle className="h-3.5 w-3.5" />
             <span>ESTOP</span>
           </button>
-
-          <span className="text-slate-700">|</span>
-
-          {/* Profile Avatar & Username */}
-          <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-[#B5ACF3] text-white flex items-center justify-center font-semibold text-[9px] shadow-sm">
-              OP
-            </div>
-            <span className="text-white hidden sm:inline font-medium">Bilal</span>
-          </div>
         </div>
 
       </div>
 
       {/* WRAPPER FOR SIDEBAR AND MAIN CONTENT */}
       <div className="flex-1 flex p-5 w-full">
-        <div className="w-full max-w-[1600px] mx-auto bg-[#EAEDF1] flex rounded-[40px] shadow-2xl overflow-hidden border-8 border-[#1E2022]/10 min-h-[90vh]">
+        <div className="w-full max-w-[1600px] mx-auto bg-[#E1DCC9] flex rounded-[40px] shadow-2xl overflow-hidden border-8 border-[#1F150C]/10 min-h-[90vh]">
         
         {/* SIDEBAR NAVIGATION */}
-        <aside className="w-72 bg-[#1E2022] flex flex-col justify-between p-6 text-white rounded-[32px] m-3 shadow-xl">
+        <aside className="w-72 bg-[#1F150C] flex flex-col justify-between p-6 text-white rounded-[32px] m-3 shadow-xl">
           <div>
             <div className="flex items-center gap-3 px-3 py-4 mb-6">
-              <Activity className="h-6 w-6 text-[#CFFF3E] animate-pulse" />
+              <Activity className="h-6 w-6 text-[#E1DCC9] animate-pulse" />
               <span className="text-xl font-extrabold tracking-tight text-white flex items-center gap-1">
-                OSRS <span className="text-[#CFFF3E] font-medium text-xs bg-white/10 px-2 py-0.5 rounded-full">v1.2</span>
+                OSRS <span className="text-[#E1DCC9] font-medium text-xs bg-white/10 px-2 py-0.5 rounded-full">v1.2</span>
               </span>
             </div>
 
@@ -1385,14 +1517,15 @@ export default function App() {
                 { id: "dashboard", label: "Dashboard", icon: Home },
                 { id: "control", label: "Arm Control", icon: Sliders },
                 { id: "emotemaker", label: "Emotes & Maker", icon: Play },
-                { id: "digitaltwin", label: "Digital Twin", icon: Eye },
                 { id: "dataflow", label: "Dataflow Graph", icon: Network },
                 { id: "research", label: "Research Balancer", icon: TrendingUp },
                 { id: "recording", label: "Replay & Record", icon: Database },
                 { id: "calibration", label: "Calibration", icon: Wrench },
                 { id: "mapper", label: "CAD ID Mapper", icon: Settings },
                 { id: "vision", label: "Vision System", icon: Video },
-                { id: "diagnostics", label: "Diagnostics", icon: Activity }
+                { id: "diagnostics", label: "Diagnostics", icon: Activity },
+                { id: "about", label: "About Us", icon: Info },
+                { id: "manual", label: "Product Manual", icon: BookOpen }
               ].map((item) => {
                 const Icon = item.icon;
                 const active = activeTab === item.id;
@@ -1416,17 +1549,17 @@ export default function App() {
                     }}
                     className={`w-full flex items-center justify-between px-5 py-3.5 rounded-full text-sm font-bold transition-all duration-200 ${
                       active 
-                        ? "bg-white text-[#1E2022] shadow-lg" 
-                        : "text-[#7E8B93] hover:text-white hover:bg-white/5"
+                        ? "bg-[#E1DCC9] text-[#1F150C] shadow-lg" 
+                        : "text-[#E1DCC9]/65 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
-                      <Icon className={`h-5 w-5 shrink-0 ${active ? "text-[#1E2022]" : "text-[#7E8B93]"}`} />
+                      <Icon className={`h-5 w-5 shrink-0 ${active ? "text-[#1F150C]" : "text-[#E1DCC9]/65"}`} />
                       <span>{item.label}</span>
                     </div>
                     {badge !== null && (
                       <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                        active ? "bg-[#1E2022] text-[#CFFF3E]" : "bg-[#CFFF3E] text-[#1E2022]"
+                        active ? "bg-[#1F150C] text-[#E1DCC9]" : "bg-[#412D15] text-[#E1DCC9]"
                       }`}>
                         {badge}
                       </span>
@@ -1439,19 +1572,19 @@ export default function App() {
 
           {/* SIDEBAR BOTTOM QUICK AUTOPILOT / ESTOP CARD */}
           <div className="mt-8">
-            <div className="bg-[#CFFF3E] text-[#1E2022] p-5 rounded-[28px] flex flex-col gap-4 shadow-md relative overflow-hidden">
+            <div className="bg-[#E1DCC9] text-[#1F150C] p-5 rounded-[28px] flex flex-col gap-4 shadow-md relative overflow-hidden border border-[#412D15]/10">
               <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-black/5 rounded-full pointer-events-none" />
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1E2022]/60">Autopilot Center</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1F150C]/60">Autopilot Center</span>
                 <h4 className="text-base font-black leading-tight mt-0.5">OSRS GUARD ACTIVE</h4>
-                <p className="text-[11px] font-bold text-[#1E2022]/70 mt-1">Speed limit: {connSpeedLimit} RPM</p>
+                <p className="text-[11px] font-bold text-[#1F150C]/75 mt-1">Speed limit: {connSpeedLimit} RPM</p>
               </div>
               <button 
                 onClick={toggleEstop}
                 className={`w-full text-white font-extrabold py-3 px-4 rounded-full text-xs shadow-sm tracking-wider uppercase transition-all ${
                   estopActive 
                     ? "bg-red-600 hover:bg-red-700 animate-bounce" 
-                    : "bg-[#1E2022] hover:bg-black"
+                    : "bg-[#1F150C] hover:bg-[#412D15]"
                 }`}
               >
                 {estopActive ? "DISABLE ESTOP" : "ENGAGE ESTOP"}
@@ -1461,7 +1594,7 @@ export default function App() {
         </aside>
 
         {/* MAIN WORKSPACE CANVAS */}
-        <main className="flex-1 flex flex-col p-6 overflow-y-auto bg-[#EAEDF1]">
+        <main className="flex-1 flex flex-col p-6 overflow-y-auto bg-[#E1DCC9]">
 
           {/* ALERT NOTIFICATIONS */}
           {alertBanner && (
@@ -1476,238 +1609,266 @@ export default function App() {
               <button onClick={() => setAlertBanner(null)} className="opacity-75 hover:opacity-100 font-extrabold">✕</button>
             </div>
           )}
-
           {/* TAB 1: DASHBOARD */}
-          {activeTab === "dashboard" && (
-            <div className="space-y-6 animate-fade-in">
-              
-              {/* Operator Welcome Panel */}
-              <div className="mb-4">
-                <h2 className="text-3xl font-black text-[#1E2022] tracking-tight">Robot Overview</h2>
-                <p className="text-xs text-[#7E8B93] font-bold mt-0.5">Take control of your robotic system today!</p>
-              </div>
-
-              {/* Startup Connection Bar if offline */}
-              {!connected && (
-                <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
-                  <div>
-                    <h3 className="text-xl font-extrabold text-[#1E2022] flex items-center gap-2">
-                      <WifiOff className="h-5 w-5 text-slate-400" /> Start Connection
-                    </h3>
-                    <p className="text-slate-500 mt-1 text-xs font-semibold">Configure serial link parameters and establish communication line.</p>
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-center bg-slate-50 p-2 rounded-2xl border border-slate-200">
-                    <input 
-                      type="text" 
-                      value={connPort}
-                      onChange={(e) => setConnPort(e.target.value)}
-                      placeholder="COM14"
-                      className="bg-white px-4 py-2 rounded-xl text-xs font-bold w-28 focus:outline-none border border-slate-200"
-                    />
-                    <select
-                      value={connBaud}
-                      onChange={(e) => setConnBaud(parseInt(e.target.value))}
-                      className="bg-white border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold focus:outline-none cursor-pointer"
-                    >
-                      <option value={4000000}>4M bps</option>
-                      <option value={1000000}>1M bps</option>
-                      <option value={115200}>115200 bps</option>
-                      <option value={57600}>57600 bps</option>
-                    </select>
-                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer px-2">
-                      <input 
-                        type="checkbox"
-                        checked={connMock}
-                        onChange={(e) => setConnMock(e.target.checked)}
-                        className="rounded text-blue-600 w-4 h-4 cursor-pointer"
-                      />
-                      Mock Mode
-                    </label>
-                    <button
-                      onClick={triggerConnect}
-                      className="bg-[#1E2022] hover:bg-black text-white px-6 py-2.5 rounded-full text-xs font-bold transition shadow-md"
-                    >
-                      CONNECT
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Main Overhaul Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {activeTab === "dashboard" && (() => {
+            const visibleLogs = logs.slice(clearOffset);
+            return (
+              <div className="space-y-6 animate-fade-in">
                 
-                {/* Column 1: Joint Energy/Load Distribution (Large card) */}
-                <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-200/50 flex flex-col justify-between min-h-[460px]">
-                  <div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-black text-[#7E8B93] uppercase tracking-wider">Actuator Ticks Distribution</span>
-                      <span className="text-[10px] font-black text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full">+12% load</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-[#1E2022] mt-1">4.2k <span className="text-xs font-bold text-[#7E8B93]">ticks today</span></h3>
+                {/* Futuristic Welcome Hero Banner */}
+                <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#000000] via-[#1F150C] to-[#412D15] p-6 md:p-8 border border-[#412D15]/40 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(225,220,201,0.08),transparent_50%)]" />
+                  <div className="relative z-10">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-[#E1DCC9] bg-[#E1DCC9]/10 px-2.5 py-1 rounded-full border border-[#E1DCC9]/25">OSRS Command Center</span>
+                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-3">Robot System Control</h2>
+                    <p className="text-[#E1DCC9]/80 text-xs font-semibold mt-1 max-w-lg">Monitor kinematics, fine-tune PID active balancers, track telemetry pipelines, and command multiple degrees-of-freedom from a single interface.</p>
                   </div>
-
-                  {/* Overlapping Circles graphic */}
-                  <div className="relative h-44 flex items-center justify-center my-4">
-                    {/* Purple/Lavender load bubble */}
-                    <div 
-                      className="absolute left-[15%] w-32 h-32 bg-[#B5ACF3] bg-opacity-95 flex flex-col items-center justify-center text-white shadow-lg border-2 border-white/50 animate-bounce z-10"
-                      style={{ borderRadius: "50%", animationDuration: "3s" }}
-                    >
-                      <span className="text-xl font-extrabold tracking-tight">2.6k</span>
-                      <span className="text-[9px] font-bold opacity-80 uppercase tracking-widest">Left Arm</span>
+                  <div className="relative z-10 flex gap-3">
+                    <div className="bg-white/5 border border-white/5 backdrop-blur-md rounded-2xl p-4 flex flex-col gap-0.5 items-center justify-center min-w-[90px] shadow-lg">
+                      <span className="text-[9px] font-bold text-[#E1DCC9]/60 uppercase tracking-widest">Active Rig</span>
+                      <span className="text-sm font-extrabold text-[#E1DCC9] mt-0.5">{handVersion}</span>
                     </div>
-                    
-                    {/* Dark Charcoal load bubble */}
-                    <div 
-                      className="absolute right-[20%] w-28 h-28 bg-[#1E2022] flex flex-col items-center justify-center text-white shadow-lg border-2 border-white/20"
-                      style={{ borderRadius: "50%" }}
-                    >
-                      <span className="text-lg font-extrabold tracking-tight">1.2k</span>
-                      <span className="text-[8px] font-bold opacity-80 uppercase tracking-widest text-[#7E8B93]">Right Arm</span>
-                    </div>
-                    
-                    {/* Neon Lime load bubble */}
-                    <div 
-                      className="absolute bottom-[5%] left-[45%] w-20 h-20 bg-[#CFFF3E] flex flex-col items-center justify-center text-[#1E2022] shadow-md border-2 border-white animate-pulse z-20"
-                      style={{ borderRadius: "50%" }}
-                    >
-                      <span className="text-base font-black tracking-tight">500</span>
-                      <span className="text-[7px] font-bold opacity-90 uppercase tracking-widest">Grip</span>
-                    </div>
-                  </div>
-
-                  {/* Progress bars matching Reference Colors */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
-                      <span>Left Arm</span>
-                      <span>45%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#B5ACF3] h-full rounded-full" style={{ width: "45%" }} />
-                    </div>
-
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
-                      <span>Right Arm</span>
-                      <span>30%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#1E2022] h-full rounded-full" style={{ width: "30%" }} />
-                    </div>
-
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
-                      <span>Peripherals</span>
-                      <span>25%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#CFFF3E] h-full rounded-full" style={{ width: "25%" }} />
+                    <div className="bg-white/5 border border-white/5 backdrop-blur-md rounded-2xl p-4 flex flex-col gap-0.5 items-center justify-center min-w-[90px] shadow-lg">
+                      <span className="text-[9px] font-bold text-[#E1DCC9]/60 uppercase tracking-widest">Bus Link</span>
+                      <span className={`text-sm font-extrabold mt-0.5 ${connected ? "text-emerald-450" : "text-rose-450"}`}>{connected ? "ONLINE" : "OFFLINE"}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Column 2: Stats cards & Signal Activity */}
-                <div className="space-y-6 flex flex-col justify-between">
-                  {/* Small card 1: Temp / CPU */}
-                  <div className="bg-white rounded-[32px] p-5 shadow-sm border border-slate-200/50 flex justify-between items-center">
-                    <div>
-                      <span className="text-[10px] font-black text-[#7E8B93] uppercase tracking-wider block">System CPU Load</span>
-                      <h4 className="text-2xl font-black text-[#1E2022] mt-1">{systemStats.cpu}%</h4>
-                      <span className="text-[9px] text-[#7E8B93] font-bold mt-0.5 block">Avg: 5.4%</span>
+                {/* Startup Connection Station if offline */}
+                {!connected && (
+                  <div className="relative overflow-hidden bg-[#1F150C]/90 backdrop-blur-md rounded-[32px] p-6 border border-[#412D15]/40 shadow-xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#412D15]/10 to-transparent animate-pulse" />
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-widest">
+                        <WifiOff className="h-4 w-4" />
+                        <span>Link Offline</span>
+                      </div>
+                      <h3 className="text-lg font-black text-white mt-1.5">Configure Communications Link</h3>
+                      <p className="text-[#E1DCC9]/70 mt-1 text-xs font-semibold">Enter the serial port ID and serial bus baudrate speed parameters to initialize joint feedback.</p>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-[#B5ACF3]/20 flex items-center justify-center">
-                      <Cpu className="w-5 h-5 text-[#B5ACF3]" />
+                    
+                    <div className="relative z-10 flex flex-wrap gap-3 items-end bg-[#000000]/60 p-2.5 rounded-2xl border border-[#412D15]/30 shadow-inner w-full lg:w-auto">
+                      <div className="flex flex-col gap-1 w-full sm:w-28">
+                        <label className="text-[8px] font-bold text-[#E1DCC9]/60 uppercase tracking-widest px-1">Serial Port</label>
+                        <input 
+                          type="text" 
+                          value={connPort}
+                          onChange={(e) => setConnPort(e.target.value)}
+                          placeholder="COM14"
+                          className="bg-[#1F150C] border border-[#412D15]/50 focus:border-[#E1DCC9] rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none w-full transition-colors"
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col gap-1 w-full sm:w-36 relative">
+                        <label className="text-[8px] font-bold text-[#E1DCC9]/60 uppercase tracking-widest px-1">Baudrate Speed</label>
+                        <button
+                          type="button"
+                          onClick={() => setShowBaudDropdownDashboard(!showBaudDropdownDashboard)}
+                          className="bg-[#1F150C] border border-[#412D15]/50 hover:border-[#412D15]/80 focus:border-[#E1DCC9] rounded-xl px-3 py-2 text-xs font-bold text-white flex items-center justify-between cursor-pointer w-full transition-colors h-[34px]"
+                        >
+                          <span>{BAUDRATE_OPTIONS.find(o => o.value === connBaud)?.label || "Select speed"}</span>
+                          <svg className={`w-3.5 h-3.5 text-[#E1DCC9]/70 transition-transform duration-200 ${showBaudDropdownDashboard ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        
+                        {showBaudDropdownDashboard && (
+                          <>
+                            <div 
+                              className="fixed inset-0 z-40" 
+                              onClick={() => setShowBaudDropdownDashboard(false)} 
+                            />
+                            <div className="absolute left-0 right-0 mt-12 bg-[#1F150C] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-[#412D15]/50 p-1 z-50 flex flex-col gap-0.5 text-white font-sans animate-in fade-in slide-in-from-top-2 duration-150">
+                              {BAUDRATE_OPTIONS.map((opt) => (
+                                <button
+                                  key={opt.value}
+                                  type="button"
+                                  onClick={() => {
+                                    setConnBaud(opt.value);
+                                    setShowBaudDropdownDashboard(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
+                                    connBaud === opt.value 
+                                      ? "bg-[#E1DCC9] text-[#1F150C]" 
+                                      : "hover:bg-[#412D15]/65 text-[#E1DCC9]/90 hover:text-white"
+                                  }`}
+                                >
+                                  {opt.label}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      
+                      <label className="flex items-center gap-2 text-xs font-bold text-[#E1DCC9]/80 hover:text-white cursor-pointer px-3 py-2 rounded-xl bg-[#412D15]/30 border border-[#412D15]/50 hover:border-[#412D15]/80 transition-colors w-full sm:w-auto justify-center">
+                        <input 
+                          type="checkbox"
+                          checked={connMock}
+                          onChange={(e) => setConnMock(e.target.checked)}
+                          className="rounded text-[#E1DCC9] bg-[#1F150C] border-[#412D15]/50 w-4 h-4 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none"
+                        />
+                        <span>Mock Mode</span>
+                      </label>
+                      
+                      <button
+                        onClick={triggerConnect}
+                        className="w-full sm:w-auto bg-[#E1DCC9] hover:bg-[#E1DCC9]/90 active:scale-[0.98] text-[#1F150C] px-6 py-3.5 rounded-xl text-xs font-extrabold tracking-wider transition-all uppercase shadow-lg shadow-[#E1DCC9]/10"
+                      >
+                        Connect Link
+                      </button>
                     </div>
                   </div>
+                )}
 
-                  {/* Small card 2: Telemetry latency */}
-                  <div className="bg-white rounded-[32px] p-5 shadow-sm border border-slate-200/50 flex justify-between items-center">
-                    <div>
-                      <span className="text-[10px] font-black text-[#7E8B93] uppercase tracking-wider block">Bus Latency</span>
-                      <h4 className="text-2xl font-black text-[#1E2022] mt-1">{systemStats.latency} ms</h4>
-                      <span className="text-[9px] text-[#7E8B93] font-bold mt-0.5 block">FPS: {systemStats.fps} Hz</span>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-[#CFFF3E]/20 flex items-center justify-center">
-                      <Activity className="w-5 h-5 text-[#1E2022]" />
-                    </div>
-                  </div>
-
-                  {/* Live Telemetry Terminal in Column 2 */}
-                  <div className="bg-[#1E2022] rounded-[32px] p-6 shadow-lg text-white flex-1 flex flex-col justify-between min-h-[220px]">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-2">
-                        <Terminal className="h-5 w-5 text-[#CFFF3E]" />
-                        <span className="font-extrabold text-sm tracking-tight text-slate-100">Live Telemetry Terminal</span>
+                {/* Main Overhaul Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  
+                  {/* Column 1: Stats cards & Signal Activity */}
+                  <div className="space-y-6 flex flex-col justify-between">
+                    {/* Small card 1: Temp / CPU */}
+                    <div className="bg-[#1F150C]/90 backdrop-blur-md rounded-[32px] p-6 shadow-xl border border-[#412D15]/40 flex justify-between items-center transition-all hover:scale-[1.01] duration-300">
+                      <div>
+                        <span className="text-[10px] font-black text-[#E1DCC9]/70 uppercase tracking-widest block">System CPU Load</span>
+                        <h4 className="text-3xl font-black text-[#E1DCC9] mt-2">{systemStats.cpu}%</h4>
+                        <span className="text-[9px] text-[#E1DCC9]/55 font-bold mt-1 block">Utilization Nominal</span>
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-[#E1DCC9]/10 flex items-center justify-center border border-[#E1DCC9]/20 shadow-inner">
+                        <Cpu className="w-5 h-5 text-[#E1DCC9]" />
                       </div>
                     </div>
-                    <div ref={terminalRef} className="bg-black/40 font-mono text-[10px] p-3.5 rounded-2xl h-36 overflow-y-auto border border-white/5 flex flex-col gap-0.5 text-slate-300 flex-1">
-                      {logs.length > 0 ? (
-                        logs.map((log, index) => {
-                          let textColor = "text-slate-300";
-                          if (log.includes("ERROR")) textColor = "text-red-400 font-bold";
-                          else if (log.includes("WARNING")) textColor = "text-amber-400";
-                          else if (log.includes("AUTO-RESTART")) textColor = "text-[#CFFF3E]";
-                          return <div key={index} className={textColor}>{log}</div>;
-                        })
-                      ) : (
-                        <div className="text-slate-600 text-center py-8 italic text-xs">Terminal lines empty. Verify hardware connection.</div>
-                      )}
-                      <div ref={logEndRef} />
-                    </div>
-                  </div>
-                </div>
 
-                {/* Column 3: Wellness Index / Node Integrity Matrix */}
-                <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-200/50 flex flex-col justify-between min-h-[460px]">
-                  <div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-black text-[#7E8B93] uppercase tracking-wider">Integrity Channel Index</span>
-                      <span className="text-[10px] font-black text-[#CFFF3E] bg-[#1E2022] px-2.5 py-0.5 rounded-full">{systemStats.health}% Good</span>
+                    {/* Small card 2: Telemetry latency */}
+                    <div className="bg-[#1F150C]/90 backdrop-blur-md rounded-[32px] p-6 shadow-xl border border-[#412D15]/40 flex justify-between items-center transition-all hover:scale-[1.01] duration-300">
+                      <div>
+                        <span className="text-[10px] font-black text-[#E1DCC9]/70 uppercase tracking-widest block">Bus Network Latency</span>
+                        <h4 className="text-3xl font-black text-[#E1DCC9] mt-2">{systemStats.latency} ms</h4>
+                        <span className="text-[9px] text-[#E1DCC9]/55 font-bold mt-1 block">Frame Speed: {systemStats.fps} Hz</span>
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-[#E1DCC9]/10 flex items-center justify-center border border-[#E1DCC9]/20 shadow-inner">
+                        <Activity className="w-5 h-5 text-[#E1DCC9]" />
+                      </div>
                     </div>
-                    <h3 className="text-3xl font-black text-[#1E2022] mt-1">{activeMotorIds.length} <span className="text-xs font-bold text-[#7E8B93]">Nodes Connected</span></h3>
-                  </div>
 
-                  <div className="flex-1 flex flex-col justify-center my-6">
-                    <div className="grid grid-cols-4 gap-2.5 p-3.5 bg-slate-50 rounded-[24px] border border-slate-100 shadow-inner">
-                      {activeMotorIds.map((mid) => {
-                        const telemData = telemetry[mid] || { error: 0, torque: false };
-                        const hasError = telemData.error !== 0;
-                        const isTorqued = telemData.torque === true;
+                    {/* Live Telemetry Terminal */}
+                    <div className="bg-[#1F150C]/90 rounded-[32px] p-6 shadow-2xl border border-[#412D15]/40 text-white flex-1 flex flex-col justify-between min-h-[260px]">
+                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#412D15]/30">
+                        <div className="flex items-center gap-2">
+                          <Terminal className="h-4 w-4 text-[#E1DCC9]" />
+                          <span className="font-bold text-xs uppercase tracking-widest text-[#E1DCC9]">Live Telemetry Terminal</span>
+                        </div>
                         
-                        let dotBg = "bg-slate-200 border-slate-300";
-                        if (connected) {
-                          if (hasError) dotBg = "bg-red-500 border-red-600 text-white animate-pulse";
-                          else if (isTorqued) dotBg = "bg-[#CFFF3E] border-[#1E2022]/10";
-                          else dotBg = "bg-[#B5ACF3]/60 border-[#B5ACF3]/20";
-                        }
-
-                        return (
-                          <div 
-                            key={mid}
-                            onClick={() => {
-                              setSelectedJoint(parseInt(mid));
-                              setActiveTab("control");
-                            }}
-                            title={`Joint ID ${mid}: ${limits[mid]?.name || "Actuator"}`}
-                            className={`h-11 rounded-xl ${dotBg} border flex flex-col items-center justify-center text-[10px] font-black shadow-sm cursor-pointer hover:scale-105 transition-transform`}
+                        {/* Terminal Action Deck */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setPauseLogs(!pauseLogs)}
+                            className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition ${
+                              pauseLogs 
+                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                                : "bg-[#412D15]/50 text-[#E1DCC9]/80 hover:text-white border border-[#412D15]"
+                            }`}
+                            title={pauseLogs ? "Resume Log Stream" : "Pause Log Stream"}
                           >
-                            <span className="opacity-60 text-[8px]">ID</span>
-                            <span>{mid}</span>
-                          </div>
-                        );
-                      })}
+                            {pauseLogs ? "Paused" : "Pause"}
+                          </button>
+                          
+                          <button
+                            onClick={handleCopyLogs}
+                            className="px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider bg-[#412D15]/50 text-[#E1DCC9]/80 hover:text-white border border-[#412D15] transition"
+                            title="Copy Logs to Clipboard"
+                          >
+                            Copy
+                          </button>
+                          
+                          <button
+                            onClick={handleClearLogs}
+                            className="px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider bg-[#412D15]/50 text-rose-400 hover:text-rose-300 border border-[#412D15] hover:bg-rose-500/10 transition"
+                            title="Clear Terminal Display"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div ref={terminalRef} className="bg-[#000000]/60 font-mono text-[10px] p-4 rounded-2xl overflow-y-auto border border-[#412D15]/30 flex flex-col gap-1 text-[#E1DCC9]/90 h-40 terminal-scrollbar">
+                        {visibleLogs.length > 0 ? (
+                          visibleLogs.map((log, index) => {
+                            let textColor = "text-[#E1DCC9]/85";
+                            if (log.includes("ERROR")) textColor = "text-rose-300 font-bold";
+                            else if (log.includes("WARNING")) textColor = "text-amber-300";
+                            else if (log.includes("AUTO-RESTART")) textColor = "text-[#E1DCC9] font-medium";
+                            
+                            const lineNum = String(index + 1).padStart(2, "0");
+                            return (
+                              <div key={index} className="flex gap-2.5 leading-relaxed hover:bg-[#412D15]/20 px-1 py-0.5 rounded transition-colors duration-150">
+                                <span className="text-[#412D15] select-none font-bold">[{lineNum}]</span>
+                                <span className={textColor}>{log}</span>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="text-[#412D15] text-center py-12 italic text-xs">Terminal display empty or cleared.</div>
+                        )}
+                        <div ref={logEndRef} />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center text-[9px] text-[#7E8B93] font-black border-t border-slate-100 pt-3">
-                    <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded bg-[#CFFF3E] border border-slate-300" /> Active Torque</span>
-                    <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded bg-[#B5ACF3]/60 border border-slate-300" /> Standby/Hold</span>
-                    <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded bg-red-500 border border-red-600" /> Register Fault</span>
+                  {/* Column 2: Wellness Index / Node Integrity Matrix */}
+                  <div className="bg-[#1F150C]/90 backdrop-blur-md rounded-[32px] p-6 shadow-xl border border-[#412D15]/40 flex flex-col justify-between min-h-[460px]">
+                    <div>
+                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#412D15]/30">
+                        <span className="text-[10px] font-black text-[#E1DCC9]/70 uppercase tracking-widest">Actuator Bus Status</span>
+                        <span className="text-[9px] font-extrabold text-[#E1DCC9] bg-[#E1DCC9]/10 border border-[#E1DCC9]/20 px-2.5 py-0.5 rounded-full">{systemStats.health}% Good</span>
+                      </div>
+                      <h3 className="text-2xl font-black text-white tracking-tight">{activeMotorIds.length} <span className="text-xs font-bold text-[#E1DCC9]/80 block mt-0.5">Active Nodes Mapped on Serial Loop</span></h3>
+                    </div>
+
+                    <div className="flex-1 flex flex-col justify-center my-6">
+                      <div className="grid grid-cols-4 gap-2.5 p-4 bg-[#000000]/60 rounded-[24px] border border-[#412D15]/30 shadow-inner">
+                        {activeMotorIds.map((mid) => {
+                          const telemData = telemetry[mid] || { error: 0, torque: false };
+                          const hasError = telemData.error !== 0;
+                          const isTorqued = telemData.torque === true;
+                          
+                          let dotBg = "bg-[#1F150C] border-[#412D15]/30 text-[#E1DCC9]/40";
+                          if (connected) {
+                            if (hasError) dotBg = "bg-red-500/20 border-red-500/40 text-red-300 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.15)]";
+                            else if (isTorqued) dotBg = "bg-[#E1DCC9]/20 border-[#E1DCC9]/40 text-[#E1DCC9] shadow-[0_0_10px_rgba(225,220,201,0.15)]";
+                            else dotBg = "bg-[#412D15]/20 border-[#412D15]/30 text-[#E1DCC9]/80";
+                          }
+
+                          return (
+                            <div 
+                              key={mid}
+                              onClick={() => {
+                                setSelectedJoint(parseInt(mid));
+                                setActiveTab("control");
+                              }}
+                              title={`Joint ID ${mid}: ${limits[mid]?.name || "Actuator"}`}
+                              className={`h-12 rounded-xl ${dotBg} border flex flex-col items-center justify-center text-[10px] font-black shadow-sm cursor-pointer hover:scale-105 transition-all active:scale-95 duration-200`}
+                            >
+                              <span className="opacity-50 text-[7px] tracking-wider font-extrabold uppercase">ID</span>
+                              <span className="text-xs mt-0.5">{mid}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap justify-between items-center text-[8px] font-bold uppercase tracking-widest text-[#E1DCC9]/60 border-t border-[#412D15]/30 pt-4 gap-2">
+                      <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#E1DCC9]/20 border border-[#E1DCC9]/40" /> Active Torque</span>
+                      <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#412D15]/20 border border-[#412D15]/30" /> Standby/Hold</span>
+                      <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-red-500/20 border border-red-500/40 animate-pulse" /> Register Fault</span>
+                    </div>
                   </div>
+
                 </div>
 
               </div>
-
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 2: VISUAL CONTROL */}
           {activeTab === "control" && (
@@ -2391,23 +2552,6 @@ export default function App() {
             </div>
           )}
 
-          {/* TAB: DIGITAL TWIN */}
-          {activeTab === "digitaltwin" && (
-            <div className="space-y-6 animate-fade-in w-full h-full min-h-[450px]">
-              <div className="mb-2">
-                <h2 className="text-3xl font-black text-[#1E2022] tracking-tight">Digital Twin Workspace</h2>
-                <p className="text-xs text-[#7E8B93] font-bold mt-0.5">Real-time synchronized 3D representation of your robot.</p>
-              </div>
-              <div className="w-full h-[550px]">
-                <DigitalTwinViewer 
-                  joints={digitalTwin.joints}
-                  activeRobot={handVersion}
-                  syncMode={digitalTwin.sync_mode}
-                  onSyncModeChange={handleSyncModeChange}
-                />
-              </div>
-            </div>
-          )}
 
           {/* TAB: DATAFLOW GRAPH */}
           {activeTab === "dataflow" && (
@@ -3278,6 +3422,332 @@ export default function App() {
               </div>
             </div>
           )}
+
+          {/* TAB 8: ABOUT US */}
+          {activeTab === "about" && (
+            <div className="space-y-6 animate-fade-in">
+              {/* About Us Hero Banner */}
+              <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#000000] via-[#1F150C] to-[#412D15] p-6 md:p-8 border border-[#412D15]/40 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(225,220,201,0.08),transparent_50%)]" />
+                <div className="relative z-10">
+                  <span className="text-[10px] uppercase font-black tracking-widest text-[#E1DCC9] bg-[#E1DCC9]/10 px-2.5 py-1 rounded-full border border-[#E1DCC9]/25">OSRS Team</span>
+                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-3">About OSRS</h2>
+                  <p className="text-[#E1DCC9]/80 text-xs font-semibold mt-2 max-w-xl leading-relaxed">
+                    Open Source Robotics Suite (OSRS) is an advanced web-integrated dashboard designed for controlling, visualising, and calibrating high-degree-of-freedom robotic systems. Built as a modular workspace, it bridges kinematics simulation, serial bus telemetry, custom emote making, and computer vision hand tracking.
+                  </p>
+                </div>
+              </div>
+
+              {/* The Builders Grid */}
+              <div className="space-y-4">
+                <h3 className="text-base font-black text-[#1F150C] uppercase tracking-wider px-2">Project Builders</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  
+                  {/* Aditya Jadav */}
+                  <div className="bg-white/60 backdrop-blur-md rounded-[28px] p-6 border border-[#412D15]/20 shadow-md flex flex-col justify-between hover:scale-[1.02] active:scale-[0.99] transition-all duration-300">
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-[#1F150C] text-[#E1DCC9] flex items-center justify-center font-black text-base shadow-md mb-4">
+                        AJ
+                      </div>
+                      <h4 className="text-lg font-black text-[#1F150C]">Aditya Jadav</h4>
+                    </div>
+                    <a 
+                      href="https://github.com/adityajadav203-cpu"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#1F150C] hover:bg-[#412D15] text-[#E1DCC9] font-bold text-[11px] uppercase tracking-wider py-3 px-4 rounded-full inline-flex items-center justify-center gap-2 mt-6 transition-colors shadow-sm"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                      <span>GitHub Profile</span>
+                    </a>
+                  </div>
+
+                  {/* Archie Veera */}
+                  <div className="bg-white/60 backdrop-blur-md rounded-[28px] p-6 border border-[#412D15]/20 shadow-md flex flex-col justify-between hover:scale-[1.02] active:scale-[0.99] transition-all duration-300">
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-[#1F150C] text-[#E1DCC9] flex items-center justify-center font-black text-base shadow-md mb-4">
+                        AV
+                      </div>
+                      <h4 className="text-lg font-black text-[#1F150C]">Archie Veera</h4>
+                    </div>
+                    <a 
+                      href="https://github.com/archieveera04-del"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#1F150C] hover:bg-[#412D15] text-[#E1DCC9] font-bold text-[11px] uppercase tracking-wider py-3 px-4 rounded-full inline-flex items-center justify-center gap-2 mt-6 transition-colors shadow-sm"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                      <span>GitHub Profile</span>
+                    </a>
+                  </div>
+
+                  {/* Bilal Sabugar */}
+                  <div className="bg-white/60 backdrop-blur-md rounded-[28px] p-6 border border-[#412D15]/20 shadow-md flex flex-col justify-between hover:scale-[1.02] active:scale-[0.99] transition-all duration-300">
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-[#1F150C] text-[#E1DCC9] flex items-center justify-center font-black text-base shadow-md mb-4">
+                        BS
+                      </div>
+                      <h4 className="text-lg font-black text-[#1F150C]">Bilal Sabugar</h4>
+                    </div>
+                    <a 
+                      href="https://github.com/BilalSabugar"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#1F150C] hover:bg-[#412D15] text-[#E1DCC9] font-bold text-[11px] uppercase tracking-wider py-3 px-4 rounded-full inline-flex items-center justify-center gap-2 mt-6 transition-colors shadow-sm"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                      <span>GitHub Profile</span>
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Project Repo Card */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-[#000000] via-[#1F150C] to-[#412D15] p-6 md:p-8 border border-[#412D15]/40 shadow-2xl rounded-[32px] flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mt-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#412D15]/10 to-transparent animate-pulse" />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 text-[#E1DCC9] font-bold text-xs uppercase tracking-widest">
+                    <Globe className="h-4 w-4" />
+                    <span>Open Source Source Code</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white mt-1.5">Official Repository</h3>
+                  <p className="text-[#E1DCC9]/70 mt-1 text-xs font-semibold">Explore the source files, submit issues, propose pull requests, and deploy custom instances of OSRS.</p>
+                </div>
+                <div className="relative z-10 w-full lg:w-auto flex items-center gap-3">
+                  <a
+                    href="https://github.com/BilalSabugar/OSRS"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full lg:w-auto bg-[#E1DCC9] hover:bg-[#E1DCC9]/90 active:scale-[0.98] text-[#1F150C] px-6 py-3.5 rounded-xl text-xs font-extrabold tracking-wider transition-all uppercase shadow-lg inline-flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span>Go To Repository</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 9: PRODUCT MANUAL */}
+          {activeTab === "manual" && (() => {
+            const MANUAL_TOPICS = [
+              {
+                id: "overview",
+                title: "1. Core FastAPI Server & API Endpoints",
+                category: "API Reference",
+                summary: "Understanding the WebSocket telemetry broadcast and HTTP control routers inside src/core/server.py.",
+                why: "Binds frontend user interface triggers to hardware communication threads using asynchronous socket handles.",
+                how: "API routes include: POST /api/connect (opens serial COM ports), POST /api/disconnect (closes COM), POST /api/motors/torque (enables/disables node torque), POST /api/calibration/tare (zeros load cells), POST /api/research/start / stop (activates active balancer loop), POST /api/research/tune (real-time PID gain updates). Telemetry broadcasts at 50Hz via WS /ws/telemetry.",
+                what: "Coordinates connection state locks, updates hardware control inputs, and streams position feedback frames.",
+                warning: "Only execute POST requests when the serial link is connected, otherwise endpoints report 503 Service Unavailable errors."
+              },
+              {
+                id: "robots",
+                title: "2. Actuator Platform Profiles (src/modules/robots/)",
+                category: "Robot Profiles",
+                summary: "Exhaustive details on humanoid, LEAP hand, and OMX manipulator profiles.",
+                why: "Robot classes define joints coordinates mapping profiles, torque tables, and coordinate limits to decouple backend hardware configurations.",
+                how: "Classes subclass BaseRobot: humanoid.py (coordinates 16 joints, parses offsets from chiman_calibration.json), leap_hand.py (coordinates 16 biomimetic hand motors, configures profiles via osrs_config.json), omx.py (maps 5-axis manipulator joints), rover.py (skid-steer calculations for 6-wheel models).",
+                what: "Verifies joint angles bounds, translates raw servo positions, and maps mechanical mirroring variables.",
+                warning: "Editing physical limits inside profiles can override safety constraints; always check hardware specification bounds first."
+              },
+              {
+                id: "perception",
+                title: "3. Perception & Sensors (src/modules/perception/)",
+                category: "Sensors Pipeline",
+                summary: "Processing camera depth feeds, IMU orientations, and weight counts.",
+                why: "Converts noisy raw hardware sensor streams into filtered coordinate telemetry used by control loop feedback engines.",
+                how: "Drivers include: realsense_vision.py (captures Intel RealSense depth streams, tracks ArUco markers on fingers to mask the plate boundary box), force_sensing.py (reads counts from Arduino Uno scale processors), imu_fusion.py (calculates roll/pitch from MPU6050 gyroscope sensors), vision.py (OpenCV Hue/Saturation/Value targeting tracker).",
+                what: "Filters reflection highlights, runs orientation filters, and measures target weight scales.",
+                warning: "Ensure camera targets remain inside the Plate Bounding Box; coordinates calculated outside boundary limits are rejected."
+              },
+              {
+                id: "research",
+                title: "4. Control Theory & Research (src/modules/research/)",
+                category: "Control Systems",
+                summary: "Analyzing plate balancing PID loops, RLS modeling, and auto-tuning exploration.",
+                why: "Maintains target balancing center positions using active control algorithms.",
+                how: "ball_balancer.py controls active plate tilts. Select presets like Circle or Infinity paths. Tune Proportional (P), Integral (I), and Derivative (D) gains. Active Exploration generates periodic sine/cosine exploration patterns to dynamically calibrate load-cell mass maps using Recursive Least Squares (RLS).",
+                what: "Computes tilt angles, logs coordinates shifts, and updates model projection matrices.",
+                warning: "Set integral gains (Ki) lower to prevent integral windup, which causes large overshoot swings."
+              },
+              {
+                id: "firmware",
+                title: "5. Embedded HX711 C++ Firmware (LOAD CELL/)",
+                category: "Firmware",
+                summary: "Compiling and uploading load cell scale firmware to Arduino Uno processors.",
+                why: "Reads high-speed weight changes directly from load cell cells and streams measurements over serial links.",
+                how: "Sketch OSRS_Scale.ino (Arduino IDE) and src/main.cpp (PlatformIO) read weights from HX711 converter modules. Streams counts at 80Hz over USB serial links. Zero weight offsets upon 'tare' inputs. Use serial_monitor.py for offline testing.",
+                what: "Converts analog scale load metrics to raw count bytes.",
+                warning: "Compile firmware using the correct FQBN (arduino:avr:uno) to prevent sketch flash failures."
+              },
+              {
+                id: "diagnostics",
+                title: "6. Diagnostics & Safety Failsafes",
+                category: "Diagnostics & Safety",
+                summary: "Resolving motor faults, mock error injection, and emergency ESTOP controls.",
+                why: "Halts hardware execution cycles instantly when electrical, mechanical, or signal errors occur.",
+                how: "Press Reboot on individual joints to clear overload (0x20) or overheating (0x04) Dynamixel register faults. Inject mock errors to test safety recovery scripts. Press the ESTOP header button or press Alt+S to release torque globally.",
+                what: "Checks error feedback registers and cuts serial loop communication signals.",
+                warning: "ESTOP cuts torque instantly; support heavy mechanical components manually beforehand to prevent structural drops."
+              }
+            ];
+
+            const filteredTopics = MANUAL_TOPICS.filter(topic =>
+              topic.title.toLowerCase().includes(manualSearch.toLowerCase()) ||
+              topic.category.toLowerCase().includes(manualSearch.toLowerCase()) ||
+              topic.summary.toLowerCase().includes(manualSearch.toLowerCase()) ||
+              topic.why.toLowerCase().includes(manualSearch.toLowerCase()) ||
+              topic.how.toLowerCase().includes(manualSearch.toLowerCase()) ||
+              topic.what.toLowerCase().includes(manualSearch.toLowerCase())
+            );
+
+            return (
+              <div className="space-y-6 animate-fade-in text-[#1F150C]">
+                {/* Header Card */}
+                <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#000000] via-[#1F150C] to-[#412D15] p-6 md:p-8 border border-[#412D15]/40 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(225,220,201,0.08),transparent_50%)]" />
+                  <div className="relative z-10 w-full md:w-2/3">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-[#E1DCC9] bg-[#E1DCC9]/10 px-2.5 py-1 rounded-full border border-[#E1DCC9]/25">Interactive Manual</span>
+                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-3">OSRS Operator's Guide</h2>
+                    <p className="text-[#E1DCC9]/80 text-xs font-semibold mt-2 leading-relaxed">
+                      Search, inspect, and configure every core feature of OSRS. Click a topic to expand dynamic setup tutorials, capability notes, and safety guidelines.
+                    </p>
+                  </div>
+                  {/* Dynamic Search */}
+                  <div className="relative z-10 w-full md:w-80">
+                    <div className="relative">
+                      <Search className="absolute left-4 top-3.5 h-4 w-4 text-[#E1DCC9]/50" />
+                      <input
+                        type="text"
+                        placeholder="Search manual topics..."
+                        value={manualSearch}
+                        onChange={(e) => setManualSearch(e.target.value)}
+                        className="w-full bg-[#1F150C]/60 hover:bg-[#1F150C]/80 focus:bg-[#1F150C] border border-[#412D15] text-[#E1DCC9] placeholder-[#E1DCC9]/40 rounded-2xl pl-11 pr-4 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#E1DCC9]/30 transition-all duration-300 shadow-inner"
+                      />
+                      {manualSearch && (
+                        <button 
+                          onClick={() => setManualSearch("")} 
+                          className="absolute right-4 top-3.5 text-xs text-[#E1DCC9]/50 hover:text-white font-bold"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 gap-4">
+                  {filteredTopics.length === 0 ? (
+                    <div className="bg-white/40 backdrop-blur-md rounded-[28px] p-12 text-center border border-[#412D15]/10 shadow-md">
+                      <HelpCircle className="h-10 w-10 text-[#412D15]/40 mx-auto mb-3" />
+                      <h4 className="text-base font-black text-[#1F150C]">No manual matches found</h4>
+                      <p className="text-xs text-[#1F150C]/60 font-semibold mt-1">Try searching for keywords like "ESTOP", "COM", "Baudrate", or "Calibration".</p>
+                    </div>
+                  ) : (
+                    filteredTopics.map((topic) => {
+                      const isExpanded = expandedSection === topic.id;
+                      return (
+                        <div 
+                          key={topic.id}
+                          className="bg-white/60 backdrop-blur-md rounded-[28px] border border-[#412D15]/10 shadow-md overflow-hidden transition-all duration-300"
+                        >
+                          {/* Accordion Trigger */}
+                          <button
+                            onClick={() => setExpandedSection(isExpanded ? "" : topic.id)}
+                            className="w-full text-left p-6 flex justify-between items-center hover:bg-[#1F150C]/5 active:bg-[#1F150C]/10 transition-colors"
+                          >
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2.5">
+                                <span className="text-[10px] uppercase font-black tracking-wider text-[#412D15] bg-[#E1DCC9] px-2.5 py-0.5 rounded-full">
+                                  {topic.category}
+                                </span>
+                              </div>
+                              <h3 className="text-lg font-black text-[#1F150C] tracking-tight">{topic.title}</h3>
+                              <p className="text-xs text-[#1F150C]/75 font-semibold leading-relaxed">
+                                {topic.summary}
+                              </p>
+                            </div>
+                            <span className="text-[#1F150C]/40 text-xl font-bold px-2">
+                              {isExpanded ? "−" : "+"}
+                            </span>
+                          </button>
+
+                          {/* Accordion Content */}
+                          {isExpanded && (
+                            <div className="p-6 border-t border-[#412D15]/10 bg-[#1F150C]/[0.02] grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-down">
+                              
+                              {/* Why Card */}
+                              <div className="bg-[#E1DCC9]/20 p-5 rounded-[24px] border border-[#412D15]/10 flex flex-col justify-between space-y-3 shadow-inner">
+                                <div>
+                                  <div className="flex items-center gap-2 text-[#412D15] font-black text-xs uppercase tracking-wider mb-2">
+                                    <span className="w-5 h-5 rounded-lg bg-[#412D15] text-[#E1DCC9] flex items-center justify-center text-[10px]">?</span>
+                                    <span>Why It Exists</span>
+                                  </div>
+                                  <p className="text-xs text-[#1F150C]/80 font-bold leading-relaxed">
+                                    {topic.why}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* How Card */}
+                              <div className="bg-white/80 p-5 rounded-[24px] border border-[#412D15]/10 flex flex-col justify-between space-y-3 shadow-sm">
+                                <div>
+                                  <div className="flex items-center gap-2 text-[#1F150C] font-black text-xs uppercase tracking-wider mb-2">
+                                    <span className="w-5 h-5 rounded-lg bg-[#1F150C] text-white flex items-center justify-center text-[10px]">✓</span>
+                                    <span>How To Use</span>
+                                  </div>
+                                  <p className="text-xs text-[#1F150C]/80 font-semibold leading-relaxed">
+                                    {topic.how}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* What Card */}
+                              <div className="bg-[#1F150C]/95 text-white p-5 rounded-[24px] border border-[#412D15]/30 flex flex-col justify-between space-y-3 shadow-lg">
+                                <div>
+                                  <div className="flex items-center gap-2 text-[#E1DCC9] font-black text-xs uppercase tracking-wider mb-2">
+                                    <span className="w-5 h-5 rounded-lg bg-[#E1DCC9] text-[#1F150C] flex items-center justify-center text-[10px]">⚡</span>
+                                    <span>What It Can Do</span>
+                                  </div>
+                                  <p className="text-xs text-[#E1DCC9]/90 font-medium leading-relaxed">
+                                    {topic.what}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Warning Banner */}
+                              <div className="col-span-1 md:col-span-3 bg-red-50/60 border border-red-200/50 rounded-2xl p-4 flex items-start gap-3">
+                                <AlertTriangle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                <div>
+                                  <h5 className="text-xs font-black text-red-800 uppercase tracking-wider">Operational Caution</h5>
+                                  <p className="text-xs text-red-700/90 font-bold mt-1 leading-relaxed">
+                                    {topic.warning}
+                                  </p>
+                                </div>
+                              </div>
+
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+              </div>
+            );
+          })()}
           {/* SAVE EMOTE MODAL */}
           {showSaveModal && (
             <div className="fixed inset-0 bg-[#1E2022]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -3432,5 +3902,6 @@ export default function App() {
         </div>
       </div>
     </div>
+    </>
   );
 }

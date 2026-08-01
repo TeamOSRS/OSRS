@@ -20,8 +20,20 @@ OSRS/
 │       ├── research/              # Control algorithms and training tasks
 │       └── simulation/            # Digital twin and physics engine bridges
 ├── frontend/                      # Vite React dashboard application
+├── docs/                          # Detailed system manuals and operator's guides
 └── LOAD CELL/                     # Embedded Arduino firmware and calibrations
 ```
+
+## Documentation
+
+The repository features comprehensive guides detailing hardware setup, visual mapping coordinate convention details, tracking algorithms, and web interface controls:
+
+* **[GUI Operator's Manual](docs/GUI_MANUAL.md)**: Steps to run and navigate the web-based OSRS Command Center.
+* **[Vision System Guide](docs/vision_system_manual.md)**: Instructions for calibrating camera sensors, depth configurations, and tracking HSV parameters.
+* **[Kinematics Coordinates Map](docs/simulation_ref_mapping.md)**: Explains the skeletal bone structure configurations and coordinate conventions.
+* **[Filter & Target Tracking Explanation](docs/EXPLANATION.md)**: Explains the math and algorithms behind target reflection isolation, boundary limits, and active PID balancing.
+
+---
 
 ### 1. Core Engine
 * **Plugin Discovery**: The `PluginManager` dynamically traverses directories inside `src/modules/` at startup, registering classes that inherit from base interfaces.

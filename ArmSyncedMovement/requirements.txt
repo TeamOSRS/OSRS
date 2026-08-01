@@ -1,5 +1,0 @@
-customtkinter
-dynamixel_sdk
-numpy
-pillow
-pyserial

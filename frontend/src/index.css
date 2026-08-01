@@ -90,3 +90,19 @@ input[type=range]:active::-moz-range-thumb {
   background-color: #CFFF3E;
   border-color: #1E2022;
 }
+
+/* Custom scrollbar specifically for the dark terminal console */
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.terminal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(225, 220, 201, 0.4);
+  border-radius: 9999px;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(225, 220, 201, 0.7);
+}

@@ -6,7 +6,7 @@ from typing import Dict, List, Any, Optional
 import numpy as np
 
 # Absolute import from local tree
-from dynamixel_driver import DynamixelDriver
+from src.core.dynamixel_driver import DynamixelDriver
 from src.core.logging import logger
 from src.modules.robots.base_robot import BaseRobot
 
