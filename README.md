@@ -32,6 +32,7 @@ The repository features comprehensive guides detailing hardware setup, visual ma
 * **[Vision System Guide](docs/vision_system_manual.md)**: Instructions for calibrating camera sensors, depth configurations, and tracking HSV parameters.
 * **[Kinematics Coordinates Map](docs/simulation_ref_mapping.md)**: Explains the skeletal bone structure configurations and coordinate conventions.
 * **[Filter & Target Tracking Explanation](docs/EXPLANATION.md)**: Explains the math and algorithms behind target reflection isolation, boundary limits, and active PID balancing.
+* **[Ball Balancing Control & Estimation](docs/BALL_BALANCE_RESEARCH.md)**: Details the active PID balancing control loops, Recursive Least Squares (RLS) system identification, and sensor confidence-weighting equations.
 
 ---
 
