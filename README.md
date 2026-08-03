@@ -1,4 +1,4 @@
-# Open Source Robotics System (OSRS
+# Open Source Robotics System (OSRS)
 
 OSRS is a modular, real-time control, perception, and simulation system designed for humanoid robotics, robotic arms, and active-balancing research platforms. It features a dynamic plugin-discovery architecture, allowing developers to integrate custom robot kinematics, computer vision pipelines, sensor arrays, and simulation environments without hardcoded imports.
 
