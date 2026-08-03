@@ -6,6 +6,7 @@ This directory contains a PlatformIO project for an Arduino Uno interfacing with
 * [platformio.ini](file:///e:/Projects/OSRS/OSRS/LOAD%20CELL/platformio.ini) - PlatformIO configuration file.
 * [src/main.cpp](file:///e:/Projects/OSRS/OSRS/LOAD%20CELL/src/main.cpp) - Arduino firmware with moving average.
 * [serial_monitor.py](file:///e:/Projects/OSRS/OSRS/LOAD%20CELL/serial_monitor.py) - Python 3 serial monitor script.
+* **[Hardware Wiring & Connection Guide](../docs/HARDWARE_CONNECTIONS.md)** - Complete wiring schematic, pinouts, and Wheatstone bridge wire colors.
 
 ---
 

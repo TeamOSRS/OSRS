@@ -28,6 +28,7 @@ OSRS/
 
 The repository features comprehensive guides detailing hardware setup, visual mapping coordinate convention details, tracking algorithms, and web interface controls:
 
+* **[Hardware Connections Guide](docs/HARDWARE_CONNECTIONS.md)**: Detailed wiring diagrams and pinouts for HX711, Arduino, Wheatstone bridge load cells, and power lines.
 * **[GUI Operator's Manual](docs/GUI_MANUAL.md)**: Steps to run and navigate the web-based OSRS Command Center.
 * **[Vision System Guide](docs/vision_system_manual.md)**: Instructions for calibrating camera sensors, depth configurations, and tracking HSV parameters.
 * **[Kinematics Coordinates Map](docs/simulation_ref_mapping.md)**: Explains the skeletal bone structure configurations and coordinate conventions.
