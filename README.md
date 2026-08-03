@@ -2,7 +2,7 @@
 
 OSRS is a modular, real-time control, perception, and simulation system designed for humanoid robotics, robotic arms, and active-balancing research platforms. It features a dynamic plugin-discovery architecture, allowing developers to integrate custom robot kinematics, computer vision pipelines, sensor arrays, and simulation environments without hardcoded imports.
 
-## System Architecture
+## 
 
 The project is split into a Python backend that handles hardware driver loops and perception algorithms, and a React-based frontend that provides a real-time web dashboard for configuration, telemetry plotting, and digital twin rendering.
 
