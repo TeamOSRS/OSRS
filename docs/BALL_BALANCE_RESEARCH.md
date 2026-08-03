@@ -1,6 +1,6 @@
 # Ball Balancing Control & System Identification Research Module
 
-This document provides a comprehensive overview of the **Ball Balancer** research module inside the Open Source Robotics Suite (OSRS). It explains the physical system, research goals, engineering rationale, underlying mathematical principles, and software implementation details.
+This document provides a comprehensive overview of the **Ball Balancer** research module inside the Open Source Robotics System (OSRS). It explains the physical system, research goals, engineering rationale, underlying mathematical principles, and software implementation details.
 
 ---
 

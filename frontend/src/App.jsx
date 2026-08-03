@@ -1217,7 +1217,7 @@ export default function App() {
           
           {/* Logo Title */}
           <h1 className="text-4xl font-black tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-white via-[#E1DCC9] to-white select-none uppercase">OSRS</h1>
-          <p className="text-[9px] uppercase font-black tracking-[0.5em] text-[#E1DCC9]/60 mt-2.5">Open Source Robotics Suite</p>
+          <p className="text-[9px] uppercase font-black tracking-[0.5em] text-[#E1DCC9]/60 mt-2.5">Open Source Robotics System</p>
           
           {/* Progress Bar & Boot Logs */}
           <div className="flex flex-col items-center gap-2 mt-10">
@@ -3433,7 +3433,7 @@ export default function App() {
                   <span className="text-[10px] uppercase font-black tracking-widest text-[#E1DCC9] bg-[#E1DCC9]/10 px-2.5 py-1 rounded-full border border-[#E1DCC9]/25">OSRS Team</span>
                   <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-3">About OSRS</h2>
                   <p className="text-[#E1DCC9]/80 text-xs font-semibold mt-2 max-w-xl leading-relaxed">
-                    Open Source Robotics Suite (OSRS) is an advanced web-integrated dashboard designed for controlling, visualising, and calibrating high-degree-of-freedom robotic systems. Built as a modular workspace, it bridges kinematics simulation, serial bus telemetry, custom emote making, and computer vision hand tracking.
+                    Open Source Robotics System (OSRS) is an advanced web-integrated dashboard designed for controlling, visualising, and calibrating high-degree-of-freedom robotic systems. Built as a modular workspace, it bridges kinematics simulation, serial bus telemetry, custom emote making, and computer vision hand tracking.
                   </p>
                 </div>
               </div>

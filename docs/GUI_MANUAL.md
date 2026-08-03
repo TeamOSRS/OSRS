@@ -1,6 +1,6 @@
 # OSRS (Open-Source Robotic System) - Graphical User Interface Manual
 
-This manual provides an in-depth explanation of the user interface for **OSRS (Open-Source Robotic System)**, created by **Bilal Sabugar**. The platform is designed as a professional-grade, high-density desktop control suite with an ultra-modern cybernetic mission control aesthetic (deep graphite background `#0A0F14`, neon cyan `#00F0FF` telemetry, electric blue highlighting, and emerald operational states).
+This manual provides an in-depth explanation of the user interface for **OSRS (Open-Source Robotic System)**, created by **Bilal Sabugar**. The platform is designed as a professional-grade, high-density desktop control system with an ultra-modern cybernetic mission control aesthetic (deep graphite background `#0A0F14`, neon cyan `#00F0FF` telemetry, electric blue highlighting, and emerald operational states).
 
 ---
 

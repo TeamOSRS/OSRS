@@ -1,6 +1,6 @@
-# Open Source Robotics Suite (OSRS)
+# Open Source Robotics System (OSRS)
 
-OSRS is a modular, real-time control, perception, and simulation suite designed for humanoid robotics, robotic arms, and active-balancing research platforms. It features a dynamic plugin-discovery architecture, allowing developers to integrate custom robot kinematics, computer vision pipelines, sensor arrays, and simulation environments without hardcoded imports.
+OSRS is a modular, real-time control, perception, and simulation system designed for humanoid robotics, robotic arms, and active-balancing research platforms. It features a dynamic plugin-discovery architecture, allowing developers to integrate custom robot kinematics, computer vision pipelines, sensor arrays, and simulation environments without hardcoded imports.
 
 ## System Architecture
 
@@ -33,6 +33,7 @@ The repository features comprehensive guides detailing hardware setup, visual ma
 * **[Kinematics Coordinates Map](docs/simulation_ref_mapping.md)**: Explains the skeletal bone structure configurations and coordinate conventions.
 * **[Filter & Target Tracking Explanation](docs/EXPLANATION.md)**: Explains the math and algorithms behind target reflection isolation, boundary limits, and active PID balancing.
 * **[Ball Balancing Control & Estimation](docs/BALL_BALANCE_RESEARCH.md)**: Details the active PID balancing control loops, Recursive Least Squares (RLS) system identification, and sensor confidence-weighting equations.
+* **[Ball Balancer Research Paper](docs/BALL_BALANCER_RESEARCH_PAPER.md)**: Complete theoretical research paper, mathematics, control laws, perception algorithms, and evolution from 1D vision to 2D dual-axis load cell fusion.
 
 ---
 
