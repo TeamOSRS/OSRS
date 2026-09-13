@@ -1,0 +1,443 @@
+<mujoco model="franka_heal_simulation">
+  <compiler angle="radian" inertiafromgeom="false" discardvisual="false"/>
+
+  <option integrator="implicitfast" gravity="0 0 -9.81"/>
+
+  <default>
+    <default class="fr3">
+      <!-- Overwritten in joints 5, 6, and 7. -->
+      <joint damping="0.21" armature="0.195" frictionloss="1.137"/>
+      <position inheritrange="1"/>
+      <default class="finger">
+        <joint axis="0 1 0" type="slide" range="0 0.04" stiffness="100" springref="0.0" damping="5"/>
+      </default>
+      <default class="visual">
+        <geom type="mesh" group="2" contype="0" conaffinity="0"/>
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3" mass="0" density="0" friction="1.8 1.8 1.0" condim="4"/>
+        <default class="fingertip_pad_collision_1">
+          <geom type="box" size="0.0085 0.004 0.0085" pos="0 0.0055 0.0445" friction="1.8 1.8 1.0" condim="4"/>
+        </default>
+        <default class="fingertip_pad_collision_2">
+          <geom type="box" size="0.003 0.002 0.003" pos="0.0055 0.002 0.05" friction="1.8 1.8 1.0" condim="4"/>
+        </default>
+        <default class="fingertip_pad_collision_3">
+          <geom type="box" size="0.003 0.002 0.003" pos="-0.0055 0.002 0.05" friction="1.8 1.8 1.0" condim="4"/>
+        </default>
+        <default class="fingertip_pad_collision_4">
+          <geom type="box" size="0.003 0.002 0.0035" pos="0.0055 0.002 0.0395" friction="1.8 1.8 1.0" condim="4"/>
+        </default>
+        <default class="fingertip_pad_collision_5">
+          <geom type="box" size="0.003 0.002 0.0035" pos="-0.0055 0.002 0.0395" friction="1.8 1.8 1.0" condim="4"/>
+        </default>
+      </default>
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4"/>
+    </default>
+
+    <default class="2f85">
+      <mesh scale="0.001 0.001 0.001"/>
+      <general biastype="affine"/>
+
+      <joint axis="0 0 1"/>
+      <default class="driver">
+        <joint range="0 0.8" armature="0.005" damping="0.1" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/>
+      </default>
+      <default class="follower">
+        <joint range="-0.872664 0.872664" armature="0.001" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/>
+      </default>
+      <default class="spring_link">
+        <joint range="-0.29670597283 0.8" armature="0.001" stiffness="0.05" springref="2.62" damping="0.00125"/>
+      </default>
+      <default class="coupler">
+        <joint range="-1.57 0" armature="0.001" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/>
+      </default>
+      <default class="pad_box1">
+        <geom mass="0" type="box" pos="0 -0.0026 0.028125" size="0.011 0.004 0.009375" friction="0.7"
+          solimp="0.95 0.99 0.001" solref="0.004 1" priority="1" rgba="0.55 0.55 0.55 1"/>
+      </default>
+      <default class="pad_box2">
+        <geom mass="0" type="box" pos="0 -0.0026 0.009375" size="0.011 0.004 0.009375" friction="0.6"
+          solimp="0.95 0.99 0.001" solref="0.004 1" priority="1" rgba="0.45 0.45 0.45 1"/>
+      </default>
+    </default>
+  </default>
+
+  <asset>
+    <!-- Visual / Environment Assets -->
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+
+    <!-- Franka FR3 Assets (Materials and Meshes) -->
+    <material name="black" rgba=".2 .2 .2 1"/>
+    <material name="plate_mat" rgba="0.8 0.8 0.85 0.85"/>
+    <material name="ball_mat" rgba="0.95 0.3 0.1 1"/>
+    <material name="white" rgba="1 1 1 1"/>
+    <material name="red" rgba="1 0.072272 0.039546 1"/>
+    <material name="gray" rgba="0.863156 0.863156 0.863157 1"/>
+    <material name="button_green" rgba="0.102241 0.571125 0.102242 1"/>
+    <material name="button_red" rgba="0.520996 0.008023 0.013702 1"/>
+    <material name="button_blue" rgba="0.024157 0.445201 0.737911 1"/>
+
+    <mesh name="link0_0" file="franka_fr3/assets/link0_0.obj"/>
+    <mesh name="link0_1" file="franka_fr3/assets/link0_1.obj"/>
+    <mesh name="link0_2" file="franka_fr3/assets/link0_2.obj"/>
+    <mesh name="link0_3" file="franka_fr3/assets/link0_3.obj"/>
+    <mesh name="link0_4" file="franka_fr3/assets/link0_4.obj"/>
+    <mesh name="link0_5" file="franka_fr3/assets/link0_5.obj"/>
+    <mesh name="link0_6" file="franka_fr3/assets/link0_6.obj"/>
+    <mesh name="link1" file="franka_fr3/assets/link1.obj"/>
+    <mesh name="link2" file="franka_fr3/assets/link2.obj"/>
+    <mesh name="link3_0" file="franka_fr3/assets/link3_0.obj"/>
+    <mesh name="link3_1" file="franka_fr3/assets/link3_1.obj"/>
+    <mesh name="link4_0" file="franka_fr3/assets/link4_0.obj"/>
+    <mesh name="link4_1" file="franka_fr3/assets/link4_1.obj"/>
+    <mesh name="link5_0" file="franka_fr3/assets/link5_0.obj"/>
+    <mesh name="link5_1" file="franka_fr3/assets/link5_1.obj"/>
+    <mesh name="link5_2" file="franka_fr3/assets/link5_2.obj"/>
+    <mesh name="link6_0" file="franka_fr3/assets/link6_0.obj"/>
+    <mesh name="link6_1" file="franka_fr3/assets/link6_1.obj"/>
+    <mesh name="link6_2" file="franka_fr3/assets/link6_2.obj"/>
+    <mesh name="link6_3" file="franka_fr3/assets/link6_3.obj"/>
+    <mesh name="link6_4" file="franka_fr3/assets/link6_4.obj"/>
+    <mesh name="link6_5" file="franka_fr3/assets/link6_5.obj"/>
+    <mesh name="link6_6" file="franka_fr3/assets/link6_6.obj"/>
+    <mesh name="link6_7" file="franka_fr3/assets/link6_7.obj"/>
+    <mesh name="link7_0" file="franka_fr3/assets/link7_0.obj"/>
+    <mesh name="link7_1" file="franka_fr3/assets/link7_1.obj"/>
+    <mesh name="link7_2" file="franka_fr3/assets/link7_2.obj"/>
+    <mesh name="link7_3" file="franka_fr3/assets/link7_3.obj"/>
+
+    <mesh name="link0_coll" file="franka_fr3/assets/link0.stl"/>
+    <mesh name="link1_coll" file="franka_fr3/assets/link1.stl"/>
+    <mesh name="link2_coll" file="franka_fr3/assets/link2.stl"/>
+    <mesh name="link3_coll" file="franka_fr3/assets/link3.stl"/>
+    <mesh name="link4_coll" file="franka_fr3/assets/link4.stl"/>
+    <mesh name="link5_coll" file="franka_fr3/assets/link5.stl"/>
+    <mesh name="link6_coll" file="franka_fr3/assets/link6.stl"/>
+    <mesh name="link7_coll" file="franka_fr3/assets/link7.stl"/>
+
+    <material name="off_white" rgba="0.901961 0.921569 0.929412 1"/>
+
+    <mesh name="hand_0" file="franka_fr3/assets/hand_0.obj"/>
+    <mesh name="hand_1" file="franka_fr3/assets/hand_1.obj"/>
+    <mesh name="hand_2" file="franka_fr3/assets/hand_2.obj"/>
+    <mesh name="hand_3" file="franka_fr3/assets/hand_3.obj"/>
+    <mesh name="hand_4" file="franka_fr3/assets/hand_4.obj"/>
+    <mesh name="finger_0" file="franka_fr3/assets/finger_0.obj"/>
+    <mesh name="finger_1" file="franka_fr3/assets/finger_1.obj"/>
+    <mesh name="hand_c" file="franka_fr3/assets/hand.stl"/>
+
+    <!-- HEAL Arm Assets (Meshes and Materials) -->
+    <mesh name="heal_base_link" file="heal_meshes_v2/base_link.STL"/>
+    <mesh name="heal_link1" file="heal_meshes_v2/link1.STL"/>
+    <mesh name="heal_link2" file="heal_meshes_v2/link2.STL"/>
+    <mesh name="heal_link3" file="heal_meshes_v2/link3.STL"/>
+    <mesh name="heal_link4" file="heal_meshes_v2/link4.STL"/>
+    <mesh name="heal_link5" file="heal_meshes_v2/link5.STL"/>
+    <mesh name="heal_robotiq_base_link" file="heal_meshes_v2/robotiq_85_base_link_coarse.STL"/>
+    <mesh name="heal_outer_knuckle" file="heal_meshes_v2/outer_knuckle_coarse.STL"/>
+    <mesh name="heal_outer_finger" file="heal_meshes_v2/outer_finger_coarse.STL"/>
+    <mesh name="heal_inner_knuckle" file="heal_meshes_v2/inner_knuckle_coarse.STL"/>
+    <mesh name="heal_inner_finger" file="heal_meshes_v2/inner_finger_coarse.STL"/>
+
+    <material name="arm" rgba="0.3 0.5 0.9 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- Lighting and Floor -->
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+    <camera name="scene_3d_view" pos="1.5 -1.5 1" xyaxes="0.7071 0.7071 0 -0.4 0.4 0.816"/>
+
+    <!-- Franka FR3 Robot (at world origin) -->
+    <body name="base" childclass="fr3">
+      <body name="fr3_link0">
+        <geom mesh="link0_0" material="black" class="visual"/>
+        <geom mesh="link0_1" material="white" class="visual"/>
+        <geom mesh="link0_2" material="white" class="visual"/>
+        <geom mesh="link0_3" material="white" class="visual"/>
+        <geom mesh="link0_4" material="white" class="visual"/>
+        <geom mesh="link0_5" material="red" class="visual"/>
+        <geom mesh="link0_6" material="black" class="visual"/>
+        <geom name="fr3_link0_collision" mesh="link0_coll" class="collision"/>
+        <body name="fr3_link1" pos="0 0 0.333">
+          <inertial pos="4.128e-07 -0.0181251 -0.0386036" quat="0.998098 -0.0605364 0.00380499 0.0110109" mass="2.92747"
+            diaginertia="0.0239286 0.0227246 0.00610634"/>
+          <joint name="fr3_joint1" axis="0 0 1" range="-2.7437 2.7437" actuatorfrcrange="-87 87"/>
+          <geom name="fr3_link1_collision" class="collision" mesh="link1_coll"/>
+          <geom material="white" mesh="link1" class="visual"/>
+          <body name="fr3_link2" quat="1 -1 0 0">
+            <inertial pos="0.00318289 -0.0743222 0.00881461" quat="0.502599 0.584437 -0.465998 0.434366" mass="2.93554"
+              diaginertia="0.0629567 0.0411924 0.0246371"/>
+            <joint name="fr3_joint2" axis="0 0 1" range="-1.7837 1.7837" actuatorfrcrange="-87 87"/>
+            <geom material="white" mesh="link2" class="visual"/>
+            <geom name="fr3_link2_collision" class="collision" mesh="link2_coll"/>
+            <body name="fr3_link3" pos="0 -0.316 0" quat="1 1 0 0">
+              <inertial pos="0.0407016 -0.00482006 -0.0289731" quat="0.921025 -0.244161 0.155272 0.260745" mass="2.2449"
+                diaginertia="0.0267409 0.0189869 0.0171587"/>
+              <joint name="fr3_joint3" axis="0 0 1" range="-2.9007 2.9007" actuatorfrcrange="-87 87"/>
+              <geom mesh="link3_0" material="white" class="visual"/>
+              <geom mesh="link3_1" material="black" class="visual"/>
+              <geom name="fr3_link3_collision" class="collision" mesh="link3_coll"/>
+              <body name="fr3_link4" pos="0.0825 0 0" quat="1 1 0 0">
+                <inertial pos="-0.0459101 0.0630493 -0.00851879" quat="0.438018 0.803311 0.00937812 0.403414"
+                  mass="2.6156" diaginertia="0.05139 0.0372717 0.0160047"/>
+                <joint name="fr3_joint4" axis="0 0 1" range="-3.0421 -0.1518" actuatorfrcrange="-87 87"/>
+                <geom mesh="link4_0" material="white" class="visual"/>
+                <geom mesh="link4_1" material="black" class="visual"/>
+                <geom name="fr3_link4_collision" class="collision" mesh="link4_coll"/>
+                <body name="fr3_link5" pos="-0.0825 0.384 0" quat="1 -1 0 0">
+                  <inertial pos="-0.00160396 0.0292536 -0.0972966" quat="0.919031 0.125604 0.0751531 -0.366003"
+                    mass="2.32712" diaginertia="0.0579335 0.0449144 0.0130634"/>
+                  <joint name="fr3_joint5" axis="0 0 1" range="-2.8065 2.8065" actuatorfrcrange="-12 12"
+                    armature="0.074" frictionloss="0.763"/>
+                  <geom mesh="link5_0" material="white" class="visual"/>
+                  <geom mesh="link5_1" material="white" class="visual"/>
+                  <geom mesh="link5_2" material="black" class="visual"/>
+                  <geom name="fr3_link5_collision" class="collision" mesh="link5_coll"/>
+                  <body name="fr3_link6" quat="1 1 0 0">
+                    <inertial pos="0.0597131 -0.0410295 -0.0101693" quat="0.621301 0.552665 0.510011 0.220081"
+                      mass="1.81704" diaginertia="0.0175039 0.0161123 0.00193529"/>
+                    <joint name="fr3_joint6" axis="0 0 1" range="0.5445 4.5169" actuatorfrcrange="-12 12"
+                      armature="0.074" frictionloss="0.44"/>
+                    <geom mesh="link6_0" material="button_green" class="visual"/>
+                    <geom mesh="link6_1" material="white" class="visual"/>
+                    <geom mesh="link6_2" material="white" class="visual"/>
+                    <geom mesh="link6_3" material="gray" class="visual"/>
+                    <geom mesh="link6_4" material="button_red" class="visual"/>
+                    <geom mesh="link6_5" material="white" class="visual"/>
+                    <geom mesh="link6_6" material="black" class="visual"/>
+                    <geom mesh="link6_7" material="button_blue" class="visual"/>
+                    <geom name="fr3_link6_collision" class="collision" mesh="link6_coll"/>
+                    <body name="fr3_link7" pos="0.088 0 0" quat="1 1 0 0">
+                      <inertial pos="0.00452258 0.00862619 -0.0161633" quat="0.727579 0.0978688 -0.24906 0.63168"
+                        mass="0.627143" diaginertia="0.000223836 0.000223642 5.64132e-07"/>
+                      <joint name="fr3_joint7" axis="0 0 1" range="-3.0159 3.0159" actuatorfrcrange="-12 12"
+                        armature="0.074" frictionloss="0.248"/>
+                      <geom mesh="link7_0" material="black" class="visual"/>
+                      <geom mesh="link7_1" material="white" class="visual"/>
+                      <geom mesh="link7_2" material="white" class="visual"/>
+                      <geom mesh="link7_3" material="black" class="visual"/>
+                      <geom name="fr3_link7_collision" class="collision" mesh="link7_coll"/>
+                      <site name="attachment_site" pos="0 0 0.107"/>
+                        <body name="hand" pos="0 0 0.107" quat="0.9238795 0 0 -0.3826834">
+                          <!-- Site at tip of Franka end-effector, in world-aligned frame -->
+                          <site name="franka_ee_site" pos="0 0 0.105" size="0.01" rgba="1 0 0 0.5"/>
+                         <inertial mass="0.73" pos="-0.01 0 0.03" diaginertia="0.001 0.0025 0.0017"/>
+                         <geom mesh="hand_0" material="off_white" class="visual"/>
+                         <geom mesh="hand_1" material="black" class="visual"/>
+                         <geom mesh="hand_2" material="black" class="visual"/>
+                         <geom mesh="hand_3" material="white" class="visual"/>
+                         <geom mesh="hand_4" material="off_white" class="visual"/>
+                         <geom mesh="hand_c" class="collision"/>
+                         <body name="left_finger" pos="0 0 0.0584">
+                           <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
+                           <joint name="finger_joint1" class="finger"/>
+                           <geom mesh="finger_0" material="off_white" class="visual"/>
+                           <geom mesh="finger_1" material="black" class="visual"/>
+                           <geom mesh="finger_0" class="collision"/>
+                           <geom class="fingertip_pad_collision_1"/>
+                           <geom class="fingertip_pad_collision_2"/>
+                           <geom class="fingertip_pad_collision_3"/>
+                           <geom class="fingertip_pad_collision_4"/>
+                           <geom class="fingertip_pad_collision_5"/>
+                         </body>
+                         <body name="right_finger" pos="0 0 0.0584" quat="0 0 0 1">
+                           <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
+                           <joint name="finger_joint2" class="finger"/>
+                           <geom mesh="finger_0" material="off_white" class="visual"/>
+                           <geom mesh="finger_1" material="black" class="visual"/>
+                           <geom mesh="finger_0" class="collision"/>
+                           <geom class="fingertip_pad_collision_1"/>
+                           <geom class="fingertip_pad_collision_2"/>
+                           <geom class="fingertip_pad_collision_3"/>
+                           <geom class="fingertip_pad_collision_4"/>
+                           <geom class="fingertip_pad_collision_5"/>
+                         </body>
+                       </body>
+                     </body>
+                  </body>
+                </body>
+              </body>
+            </body >
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- HEAL Arm (at t_world_to_heal = [-0.03, -0.80, 0.0], q_world_to_heal = [0.70710678, 0, 0, -0.70710678]) -->
+    <body name="base_link" pos="-0.03 -0.80 0.0" quat="0.70710678 0 0 -0.70710678">
+      <geom type="mesh" material="black" mesh="heal_base_link" group="2" contype="0" conaffinity="0"/>
+      <body name="link1">
+        <inertial pos="-0.01254 0 0.272" quat="0.705375 -0.0730427 -0.0734091 0.701229" mass="7.919" diaginertia="0.04739 0.0462224 0.0145875"/>
+        <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" actuatorfrcrange="-150 150"/>
+        <geom type="mesh" material="black" mesh="heal_link1" group="2" contype="0" conaffinity="0"/>
+        <body name="link2" pos="0 0 0.346">
+          <inertial pos="-0.10537 0 0.14998" quat="1 0.0002961 1.67779e-05 4.96795e-09" mass="1.017" diaginertia="0.0163836 0.0155054 0.00145326"/>
+          <joint name="joint2" pos="0 0 0" axis="-1 0 0" range="-0.75 2.05" actuatorfrcrange="-150 150"/>
+          <geom type="mesh" material="black" mesh="heal_link2" group="2" contype="0" conaffinity="0"/>
+          <body name="link3" pos="0 0 0.305">
+            <inertial pos="-0.01755 0.03359 0" quat="0.560606 0.429977 -0.560949 0.431483" mass="5.574" diaginertia="0.0233065 0.0222226 0.0089589"/>
+            <joint name="joint3" pos="0 0 0" axis="1 0 0" range="-1 1" actuatorfrcrange="-150 150"/>
+            <geom type="mesh" material="black" mesh="heal_link3" group="2" contype="0" conaffinity="0"/>
+            <body name="link4" pos="-0.0009127 0.36813 0">
+              <inertial pos="-0.05065 -0.1059 0" quat="0.397231 0.582663 -0.399374 0.585842" mass="1.894" diaginertia="0.00413039 0.00386221 0.00209546"/>
+              <joint name="joint4" pos="0 0 0" axis="0 -1 0" range="-3.14159 3.14159" actuatorfrcrange="-80 80"/>
+              <geom type="mesh" material="black" mesh="heal_link4" group="2" contype="0" conaffinity="0"/>
+              <body name="link5">
+                <inertial pos="-0.00216 -0.0036 -0.04603" quat="0.949195 0.159765 -0.0379156 -0.268451" mass="1.791" diaginertia="0.00255483 0.00247673 0.00178493"/>
+                <joint name="joint5" pos="0 0 0" axis="0.499998 0.866027 0" range="-3.14159 3.14159" actuatorfrcrange="-80 80"/>
+                <geom type="mesh" material="black" mesh="heal_link5" group="2" contype="0" conaffinity="0"/>
+                <body name="end-effector" pos="0 0 -0.0975">
+                  <!-- Site at HEAL end-effector tip -->
+                  <site name="heal_ee_site" pos="0 0 -0.05" size="0.01" rgba="0 1 0 0.5"/>
+                  <inertial pos="0.000188685 -2.02064e-10 0.0256863" quat="0.707058 0.00721091 0.00720612 0.707082" mass="0.360245" diaginertia="0.000379868 0.00036226 0.000256361"/>
+                  <joint name="joint6" pos="0 0 0" axis="0 0 -1" range="-6.28 6.28" actuatorfrcrange="-80 80"/>
+                  <geom quat="-3.67321e-06 0 -1 0" type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_robotiq_base_link" group="2" contype="0" conaffinity="0"/>
+                  <body name="left_outer_knuckle" pos="-0.0306007 0 -0.0627922" quat="-3.67321e-06 0 -1 0">
+                    <inertial pos="0.0300107 7.39879e-12 0.0176516" quat="0.704481 0.0608866 0.0608866 0.704481" mass="0.0341578" diaginertia="1.16324e-05 1.10325e-05 4.5969e-06"/>
+                    <joint name="finger_joint" pos="0 0 0" axis="0 -1 0" range="0 0.725" actuatorfrcrange="-1000 1000" stiffness="20" springref="0.725" damping="2"/>
+                    <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_outer_knuckle" group="2" contype="0" conaffinity="0"/>
+                    <geom pos="0.031691 0 -0.00193396" type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_outer_finger" group="2" contype="0" conaffinity="0"/>
+                  </body>
+                  <body name="left_inner_knuckle" pos="-0.0126995 0 -0.0693076" quat="-3.67321e-06 0 -1 0">
+                    <inertial pos="0.0170975 -3.93809e-10 0.0224918" quat="0.947655 0 -0.319297 0" mass="0.0110931" diaginertia="5.59353e-06 3.96549e-06 1.88108e-06"/>
+                    <joint name="left_inner_knuckle_joint" pos="0 0 0" axis="0 -1 0" range="0 0.8757" actuatorfrcrange="-1000 1000" damping="2.0" armature="0.005"/>
+                    <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_inner_knuckle" group="2" contype="0" conaffinity="0"/>
+                    <body name="left_inner_finger" pos="0.0345853 0 0.045497">
+                      <inertial pos="0.00602756 0 0.00669926" quat="0.699065 0.106339 0.106339 0.699065" mass="0.00724255" diaginertia="1.70064e-06 1.58577e-06 3.69621e-07"/>
+                      <joint name="left_inner_finger_joint" pos="0 0 0" axis="0 -1 0" range="-0.8757 0.8757" actuatorfrcrange="-1000 1000" damping="2.0" armature="0.005"/>
+                      <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_inner_finger" group="2" contype="0" conaffinity="0"/>
+                      <!-- High-friction collision pad box for HEAL gripper left side -->
+                      <geom type="box" size="0.004 0.011 0.020" pos="0.005 0.0 0.0" friction="1.8 1.8 1.0" solimp="0.98 0.99 0.001" solref="0.004 1" priority="1" condim="4" contype="1" conaffinity="1" group="3"/>
+                    </body>
+                  </body>
+                  <body name="right_inner_knuckle" pos="0.0127005 0 -0.0693074" quat="0 -1 0 -3.67321e-06">
+                    <inertial pos="0.0168606 3.93808e-10 0.02267" quat="0.949317 0 -0.314322 0" mass="0.0110931" diaginertia="5.59353e-06 3.96549e-06 1.88108e-06"/>
+                    <joint name="right_inner_knuckle_joint" pos="0 0 0" axis="0 1 0" range="-0.8757 0.8757" actuatorfrcrange="-1000 1000" damping="2.0" armature="0.005"/>
+                    <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_inner_knuckle" group="2" contype="0" conaffinity="0"/>
+                    <body name="right_inner_finger" pos="0.034106 0 0.0458574">
+                      <inertial pos="0.00602756 0 0.00669926" quat="0.699065 0.106339 0.106339 0.699065" mass="0.00724255" diaginertia="1.70064e-06 1.58577e-06 3.69621e-07"/>
+                      <joint name="right_inner_finger_joint" pos="0 0 0" axis="0 1 0" range="-0.8757 0.8757" actuatorfrcrange="-1000 1000" damping="2.0" armature="0.005"/>
+                      <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_inner_finger" group="2" contype="0" conaffinity="0"/>
+                      <!-- High-friction collision pad box for HEAL gripper right side -->
+                      <geom type="box" size="0.004 0.011 0.020" pos="-0.005 0.0 0.0" friction="1.8 1.8 1.0" solimp="0.98 0.99 0.001" solref="0.004 1" priority="1" condim="4" contype="1" conaffinity="1" group="3"/>
+                    </body>
+                  </body>
+                  <body name="right_outer_knuckle" pos="0.0306016 0 -0.0627918" quat="0 -1 0 -3.67321e-06">
+                    <inertial pos="0.0298253 7.22554e-12 0.0176992" quat="0.704408 0.0617233 0.0617233 0.704408" mass="0.0341578" diaginertia="1.15619e-05 1.10122e-05 4.54668e-06"/>
+                    <joint name="right_outer_knuckle_joint" pos="0 0 0" axis="0 1 0" range="-0.8757 0.8757" actuatorfrcrange="-1000 1000" damping="2.0" armature="0.005"/>
+                    <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_outer_knuckle" group="2" contype="0" conaffinity="0"/>
+                    <geom pos="0.0317096 0 -0.00160136" type="mesh" rgba="0.1 0.1 0.1 1" mesh="heal_outer_finger" group="2" contype="0" conaffinity="0"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    </body>
+
+    <!-- ====== Balancing Task Objects ====== -->
+    <!-- Plate: 40cm x 40cm, Y-axis connects the two arms                  -->
+    <!-- Franka grips +Y edge at (0.20, -0.20, 0.55)                       -->
+    <!-- HEAL   grips -Y edge at (0.20, -0.60, 0.55)                       -->
+    <body name="plate" pos="0.20 -0.40 0.55">
+      <freejoint/>
+      <inertial mass="0.3" pos="0 0 0" diaginertia="0.004 0.004 0.001"/>
+      <!-- 40cm x 40cm x 6mm plate -->
+      <geom name="plate_geom" type="box" size="0.20 0.20 0.003"
+            material="plate_mat"
+            friction="0.8 0.005 0.0001"
+            contype="1" conaffinity="1"/>
+      <!-- Sites: +Y edge (Franka side), -Y edge (HEAL side), centre -->
+      <site name="plate_franka_edge" pos="0  0.20 0.003" size="0.012" rgba="0.9 0.3 0.3 1"/>
+      <site name="plate_heal_edge"   pos="0 -0.20 0.003" size="0.012" rgba="0.3 0.9 0.3 1"/>
+      <site name="plate_center"      pos="0  0    0.003" size="0.012" rgba="1.0 1.0 0.2 1"/>
+    </body>
+
+    <!-- Ball: starts centred on plate -->
+    <body name="ball" pos="0.20 -0.40 0.578">
+      <freejoint/>
+      <inertial mass="0.1" pos="0 0 0" diaginertia="8e-5 8e-5 8e-5"/>
+      <geom name="ball_geom" type="sphere" size="0.025"
+            material="ball_mat"
+            friction="0.4 0.005 0.0001"
+            contype="1" conaffinity="1"/>
+      <site name="ball_site" pos="0 0 0" size="0.008" rgba="1 1 0 1"/>
+    </body>
+
+  </worldbody>
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="finger_joint1" coef="0.5"/>
+      <joint joint="finger_joint2" coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <joint joint1="finger_joint1" joint2="finger_joint2" solimp="0.5 0.9 0.01" solref="0.02 1"/>
+    <!-- Robotiq 85 mimic constraints -->
+    <joint joint1="left_inner_knuckle_joint" joint2="finger_joint" polycoef="0 1.2 0 0 0"/>
+    <joint joint1="left_inner_finger_joint" joint2="finger_joint" polycoef="0 -1.2 0 0 0"/>
+    <joint joint1="right_outer_knuckle_joint" joint2="finger_joint" polycoef="0 -1 0 0 0"/>
+    <joint joint1="right_inner_knuckle_joint" joint2="finger_joint" polycoef="0 -1.2 0 0 0"/>
+    <joint joint1="right_inner_finger_joint" joint2="finger_joint" polycoef="0 1.2 0 0 0"/>
+
+    <!-- Welds to keep the grasp perfectly rigid throughout the simulation -->
+    <weld body1="plate" body2="hand" relpose="0 0.29 0  0.70710678 0.70710678 0 0" solimp="0.5 0.9 0.01" solref="0.02 1"/>
+    <weld body1="plate" body2="end-effector" relpose="0 -0.33 0  -0.5 -0.5 0.5 -0.5" solimp="0.5 0.9 0.01" solref="0.02 1"/>
+  </equality>
+
+  <actuator>
+    <!-- Franka FR3 Actuators -->
+    <position class="fr3" name="fr3_joint1" joint="fr3_joint1" kp="4500" kv="450"/>
+    <position class="fr3" name="fr3_joint2" joint="fr3_joint2" kp="4500" kv="450"/>
+    <position class="fr3" name="fr3_joint3" joint="fr3_joint3" kp="3500" kv="350"/>
+    <position class="fr3" name="fr3_joint4" joint="fr3_joint4" kp="3500" kv="350"/>
+    <position class="fr3" name="fr3_joint5" joint="fr3_joint5" kp="2000" kv="200"/>
+    <position class="fr3" name="fr3_joint6" joint="fr3_joint6" kp="2000" kv="200"/>
+    <position class="fr3" name="fr3_joint7" joint="fr3_joint7" kp="2000" kv="200"/>
+    <general class="fr3" name="actuator8" tendon="split" forcerange="-100 100" ctrlrange="0 255"
+      gainprm="0.01568627451 0 0" biasprm="0 -100 -10"/>
+
+    <!-- HEAL Actuators (Converted to Position control for easy control via sliders) -->
+    <position name="turret" joint="joint1" kp="5000" kv="500" />
+    <position name="shoulder" joint="joint2" kp="5000" kv="500" />
+    <position name="elbow" joint="joint3" kp="5000" kv="500" />
+    <position name="wrist_1" joint="joint4" kp="1000" kv="100" />
+    <position name="wrist_2" joint="joint5" kp="1000" kv="100" />
+    <position name="wrist_3" joint="joint6" kp="1000" kv="100" />
+    <position name="heal_gripper" joint="finger_joint" kp="100" kv="10" />
+  </actuator>
+
+  <contact>
+    <exclude body1="fr3_link0" body2="fr3_link1"/>
+    <!-- Exclude collisions between plate and gripper fingers/hand bodies to prevent force explosions with welds -->
+    <exclude body1="plate" body2="hand"/>
+    <exclude body1="plate" body2="left_finger"/>
+    <exclude body1="plate" body2="right_finger"/>
+    <exclude body1="plate" body2="end-effector"/>
+    <exclude body1="plate" body2="left_inner_finger"/>
+    <exclude body1="plate" body2="right_inner_finger"/>
+    <exclude body1="plate" body2="left_outer_knuckle"/>
+    <exclude body1="plate" body2="right_outer_knuckle"/>
+    <exclude body1="plate" body2="left_inner_knuckle"/>
+    <exclude body1="plate" body2="right_inner_knuckle"/>
+  </contact>
+
+  <keyframe>
+    <!-- Keyframe 0: Plate-holding ready configuration -->
+    <key name="hold_plate" qpos="-0.4091 -1.3020 0.1714 -2.9253 -1.4271 1.9426 0.8450 0.005 0.005 -0.1229 -0.4379 -0.6354 -1.7579 -0.2429 2.9555 0.65 0.78 -0.78 -0.78 0.78 -0.65  0.20 -0.40 0.55 1 0 0 0  0.20 -0.40 0.578 1 0 0 0"/>
+  </keyframe>
+  <sensor>
+    <force name="franka_force" site="franka_ee_site"/>
+    <force name="heal_force" site="heal_ee_site"/>
+    <torque name="franka_torque" site="franka_ee_site"/>
+    <torque name="heal_torque" site="heal_ee_site"/>
+  </sensor>
+</mujoco>
