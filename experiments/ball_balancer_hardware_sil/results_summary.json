@@ -1,0 +1,78 @@
+{
+  "manual_gains_step": {
+    "settling_time_s": 4.339999999999995,
+    "overshoot_pct": 6.828649913217975,
+    "steady_state_error_m": 0.00539516898793206,
+    "initial_error_m": 0.14918282434536365
+  },
+  "auto_tune_step": {
+    "settling_time_s": 2.3400000000000016,
+    "overshoot_pct": 14.854375659197055,
+    "steady_state_error_m": 0.017773492526027026,
+    "initial_error_m": 0.14918282434536365
+  },
+  "target_y_disconnect_check": {
+    "exploration_index_changes": [
+      [
+        1.48,
+        1,
+        0.08
+      ]
+    ],
+    "final_ball_y": -2.828562900625845e-05,
+    "final_target_y": 0.08,
+    "ball_ever_left_1cm_band": false
+  },
+  "identification_no_excitation": {
+    "final_est_a": 2.0263959934802256,
+    "final_est_b": -0.958326519832184,
+    "abs_error_a": 0.8763959934802257,
+    "abs_error_b": 0.538326519832184
+  },
+  "identification_with_excitation": {
+    "final_est_a": 1.7811063059506376,
+    "final_est_b": -0.9677946613041616,
+    "abs_error_a": 0.6311063059506377,
+    "abs_error_b": 0.5477946613041615
+  },
+  "identification_trials_identical_given_same_rng_seed": false,
+  "repeated_trials_n": 20,
+  "manual_gains_aggregate": {
+    "settling_time_s": {
+      "mean": 3.630999999999999,
+      "std": 0.7871334067361111,
+      "n": 20
+    },
+    "overshoot_pct": {
+      "mean": 9.153452298343048,
+      "std": 2.1333817798072965,
+      "n": 20
+    },
+    "steady_state_error_m": {
+      "mean": 0.009337646241237871,
+      "std": 0.001691781263255441,
+      "n": 20
+    }
+  },
+  "auto_tune_aggregate": {
+    "settling_time_s": {
+      "mean": 2.1910000000000016,
+      "std": 0.3589136386374865,
+      "n": 20
+    },
+    "overshoot_pct": {
+      "mean": 14.821086101896062,
+      "std": 1.1219858774324294,
+      "n": 20
+    },
+    "steady_state_error_m": {
+      "mean": 0.016407038161511307,
+      "std": 0.0037128081926364686,
+      "n": 20
+    }
+  },
+  "ground_truth_plant": {
+    "A_true": 1.15,
+    "B_true": -0.42
+  }
+}

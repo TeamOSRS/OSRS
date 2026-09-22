@@ -3,6 +3,10 @@
 
   <option integrator="implicitfast" gravity="0 0 -9.81"/>
 
+  <visual>
+    <global offwidth="1280" offheight="960"/>
+  </visual>
+
   <default>
     <default class="fr3">
       <!-- Overwritten in joints 5, 6, and 7. -->
