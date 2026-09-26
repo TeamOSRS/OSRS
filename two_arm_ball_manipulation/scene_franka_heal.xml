@@ -3,10 +3,6 @@
 
   <option integrator="implicitfast" gravity="0 0 -9.81"/>
 
-  <visual>
-    <global offwidth="1280" offheight="960"/>
-  </visual>
-
   <default>
     <default class="fr3">
       <!-- Overwritten in joints 5, 6, and 7. -->
@@ -394,7 +390,7 @@
 
     <!-- Welds to keep the grasp perfectly rigid throughout the simulation -->
     <weld body1="plate" body2="hand" relpose="0 0.29 0  0.70710678 0.70710678 0 0" solimp="0.5 0.9 0.01" solref="0.02 1"/>
-    <weld body1="plate" body2="end-effector" relpose="0 -0.33 0  -0.5 -0.5 0.5 -0.5" solimp="0.5 0.9 0.01" solref="0.02 1"/>
+    <weld body1="plate" body2="end-effector" relpose="0 -0.34 0  -0.5 -0.5 0.5 -0.5" solimp="0.5 0.9 0.01" solref="0.02 1"/>
   </equality>
 
   <actuator>

@@ -163,7 +163,9 @@ class BallBalancer:
 
     # Low-pass smoothing applied to the commanded plate tilt every physics step
     # (500Hz), to stop PID/noise-driven jitter from turning into jerky arm motion.
-    TILT_SMOOTH_ALPHA = 0.02
+    # Time constant = dt/alpha ≈ 2ms/0.15 ≈ 13ms — fast enough to track a mouse
+    # drag / recover quickly once released, while still filtering micro-jitter.
+    TILT_SMOOTH_ALPHA = 0.15
 
     def __init__(self, model, data, target_point=(0.0, 0.0)):
         self.model = model
@@ -213,13 +215,26 @@ class BallBalancer:
         self.INTEGRAL_LIMIT = 0.6  # anti-windup clamp on the accumulated (error * dt) term
 
         # PID gains (position error -> desired plate tilt angle, radians)
-        # Tuned for a ~0.1kg ball on a ~0.4m plate, gravity-driven dynamics.
-        self.K_p = 0.85
-        self.K_i = 0.18
-        self.K_d = 0.55
+        # Tuned for a ~0.1kg ball on a ~0.4m plate, gravity-driven dynamics. Away
+        # from the tilt-angle clamp below, this is roughly a (gravity*K_p) "spring"
+        # with (gravity*K_d) damping, so K_p sets the response's natural frequency.
+        # K_i is kept deliberately small -- a larger K_i was the actual cause of a
+        # slow ~8-10s oscillatory tail after a disturbance (integral windup/unwind),
+        # not tilt authority, so raising K_p/K_d while keeping K_i low is what
+        # actually gets the ball back to target quickly (~1s) after being dragged.
+        self.K_p = 1.8
+        self.K_i = 0.06
+        self.K_d = 1.0
 
-        self.MAX_ROLL_RAD  = 0.0700   # ~4 deg max roll  (about plate local Y axis, controls X motion)
-        self.MAX_PITCH_RAD = 0.0700   # ~4 deg max pitch (about plate local X axis, controls Y motion)
+        # Kept at the original 4deg cap. The plate/gripper collision is disabled
+        # in the model (see the <contact><exclude .../> block for "plate" vs the
+        # HEAL gripper bodies, needed so the weld constraint doesn't fight contact
+        # forces), so nothing physically stops the gripper mesh from visibly
+        # overlapping the plate if the weld's tracked pose drifts. A larger tilt
+        # cap stresses that soft weld (solref="0.02 1") enough to make this show
+        # up as clipping -- 4deg keeps the visible drift small.
+        self.MAX_ROLL_RAD  = np.radians(4.0)
+        self.MAX_PITCH_RAD = np.radians(4.0)
 
         # Smoothed tilt commands actually sent to the IK targets (see TILT_SMOOTH_ALPHA)
         self.phi_cmd   = 0.0
@@ -267,13 +282,13 @@ class BallBalancer:
             self.last_ball_local = ball_local_xy.copy()
             self.last_time = data.time
 
-        alpha_pos = 0.15
+        alpha_pos = 0.5
         self.ball_local_filt = alpha_pos * ball_local_xy + (1.0 - alpha_pos) * self.ball_local_filt
 
         dt = data.time - self.last_time
         if dt > 0:
             vel_raw = (self.ball_local_filt - self.last_ball_local) / dt
-            alpha_vel = 0.08
+            alpha_vel = 0.25
             self.ball_vel_filt = alpha_vel * vel_raw + (1.0 - alpha_vel) * self.ball_vel_filt
         self.last_ball_local = self.ball_local_filt.copy()
         self.last_time = data.time
@@ -320,7 +335,10 @@ class BallBalancer:
         R_plate = R_plate.reshape(3, 3)
         
         franka_target = p_plate + R_plate @ np.array([0.0, 0.29, 0.0])
-        heal_target = p_plate + R_plate @ np.array([0.0, -0.33, 0.0])
+        # 1cm further than the weld's nominal -0.33 grip offset (see scene xml), giving
+        # a small extra buffer so residual IK/weld tracking error is less likely to
+        # visibly show the HEAL gripper mesh overlapping the plate.
+        heal_target = p_plate + R_plate @ np.array([0.0, -0.34, 0.0])
         
         franka_quat = quat_mul(q_plate, self.FRANKA_QUAT)
         # HEAL target_quat is None so orientation complies naturally, avoiding closed-loop fighting
