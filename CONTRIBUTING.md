@@ -6,7 +6,11 @@ Thank you for your interest in contributing to the **Open Source Robotics System
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to **bilal.07.04.07@gmail.com**.
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please report any unacceptable behavior to one of the email addresses listed below:
+
+1. **adityajadav203@gmail.com**.
+2. **archieveera.04@gmail.com**.
+3. **bilal.07.04.07@gmail.com**.
 
 ---
 
