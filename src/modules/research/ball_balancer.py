@@ -198,7 +198,9 @@ class BallBalancer(BaseResearchTask):
 
         # Calibration cache configuration
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        self.calib_file_path = os.path.join(root_dir, "chiman_calibration.json")
+        self.calib_file_path = os.path.join(root_dir, "humanoid_calibration.json")
+        if not os.path.exists(self.calib_file_path):
+            self.calib_file_path = os.path.join(root_dir, "chiman_calibration.json")
         self.last_calib_mtime = 0
         self.cached_calib_l5y = -82
 

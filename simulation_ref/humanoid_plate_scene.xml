@@ -1,0 +1,99 @@
+<mujoco model="custom_humanoid_plate_scene">
+  <include file="my_bot.xml"/>
+
+  <statistic center="0 0 0.8" extent="1.5"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="140" elevation="-30"/>
+  </visual>
+
+  <asset>
+    <!-- Floor Texture & Skybox -->
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.05 0.1 0.15" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <material name="ball_color" rgba="0.8 0.15 0.15 1" shininess="0.8" specular="0.8"/>
+  </asset>
+
+  <default>
+    <default class="free_joint_class">
+      <joint damping="0.0" armature="0.0" frictionloss="0.0"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <!-- Soft environment lights -->
+    <light pos="1.5 -1.0 3.0" dir="-1.5 1.0 -3.0" directional="true" castshadow="true"/>
+    <light pos="-1.5 1.0 3.0" dir="1.5 -1.0 -3.0" directional="true" castshadow="false" diffuse="0.3 0.3 0.3"/>
+    
+    <!-- Floor Plane -->
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" class="collision"/>
+
+    <!-- ====================================================================== -->
+    <!-- PLATE ASSEMBLY (Aligned along Y-axis to bridge left & right arms)     -->
+    <!-- Initial position aligns with robot wrists at 0.0 joint configuration:  -->
+    <!-- X = 0.0, Y = 0.0, Z = 0.645                                           -->
+    <!-- ====================================================================== -->
+    <body name="plate_assembly" pos="0.0 0.0 0.695">
+      <!-- Free Joint so plate can be moved by welded arms -->
+      <joint name="plate_joint" type="free" class="free_joint_class"/>
+
+      <!-- Center Marker visual -->
+      <geom name="plate_center_marker" type="box" size="0.005 0.005 0.002" pos="0 0 0.001" rgba="1 1 0 1" contype="0" conaffinity="0" group="2"/>
+
+      <!-- U-Channel Plate Bottom (Width: 5cm, Length: 50cm, Thickness: 2mm) -->
+      <geom name="plate_bottom" type="box" size="0.025 0.25 0.001" pos="0 0 -0.01" material="acrylic_glass" friction="0.05 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+      <geom name="plate_bottom_vis" type="box" size="0.025 0.25 0.001" pos="0 0 -0.01" material="acrylic_glass" contype="0" conaffinity="0" group="2"/>
+
+      <!-- U-Channel Side Walls to keep the ball from rolling off sideways -->
+      <geom name="plate_left_wall" type="box" size="0.001 0.25 0.01" pos="0.024 0 0.0" material="white_plastic" friction="0.05 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+      <geom name="plate_left_wall_vis" type="box" size="0.001 0.25 0.01" pos="0.024 0 0.0" material="white_plastic" contype="0" conaffinity="0" group="2"/>
+
+      <geom name="plate_right_wall" type="box" size="0.001 0.25 0.01" pos="-0.024 0 0.0" material="white_plastic" friction="0.05 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+      <geom name="plate_right_wall_vis" type="box" size="0.001 0.25 0.01" pos="-0.024 0 0.0" material="white_plastic" contype="0" conaffinity="0" group="2"/>
+      
+      <!-- Plate End Caps to prevent the ball from falling off the ends -->
+      <geom name="plate_front_cap" type="box" size="0.025 0.001 0.01" pos="0 0.25 0.0" material="white_plastic" friction="0.05 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+      <geom name="plate_back_cap" type="box" size="0.025 0.001 0.01" pos="0 -0.25 0.0" material="white_plastic" friction="0.05 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+
+      <!-- Left Coupler (Grasp Handle for the left gripper) -->
+      <geom name="left_coupler" type="box" size="0.012 0.02 0.02" pos="0 0.25 0.01" material="metal_silver" contype="1" conaffinity="1" friction="1.0 0.005 0.0001" group="3"/>
+      <geom name="left_coupler_vis" type="box" size="0.012 0.02 0.02" pos="0 0.25 0.01" material="metal_silver" contype="0" conaffinity="0" group="2"/>
+
+      <!-- Right Coupler (Grasp Handle for the right gripper) -->
+      <geom name="right_coupler" type="box" size="0.012 0.02 0.02" pos="0 -0.25 0.01" material="metal_silver" contype="1" conaffinity="1" friction="1.0 0.005 0.0001" group="3"/>
+      <geom name="right_coupler_vis" type="box" size="0.012 0.02 0.02" pos="0 -0.25 0.01" material="metal_silver" contype="0" conaffinity="0" group="2"/>
+    </body>
+
+    <!-- ====================================================================== -->
+    <!-- BALL (Starts resting on the plate, offset by 5cm along Y channel)       -->
+    <!-- ====================================================================== -->
+    <body name="ball" pos="0.0 0.05 0.715">
+      <joint name="ball_joint" type="free" class="free_joint_class"/>
+      <!-- Small red sphere (Diameter 3cm) -->
+      <geom name="ball_collision" type="sphere" size="0.015" material="ball_color" density="2700" friction="0.02 0.005 0.0001" contype="1" conaffinity="1" group="3"/>
+      <geom name="ball_vis" type="sphere" size="0.015" material="ball_color" contype="0" conaffinity="0" group="2"/>
+    </body>
+  </worldbody>
+
+  <contact>
+    <!-- Exclude collisions between arm wrist/gripper bodies and the plate assembly -->
+    <!-- since we hold the plate via rigid weld equality constraints.             -->
+    <exclude body1="l_wrist_yaw_link" body2="plate_assembly"/>
+    <exclude body1="r_wrist_yaw_link" body2="plate_assembly"/>
+    <exclude body1="l_gripper_l_finger" body2="plate_assembly"/>
+    <exclude body1="l_gripper_r_finger" body2="plate_assembly"/>
+    <exclude body1="r_gripper_l_finger" body2="plate_assembly"/>
+    <exclude body1="r_gripper_r_finger" body2="plate_assembly"/>
+  </contact>
+
+  <equality>
+    <!-- Weld constraints to dynamically and rigidly bind robot wrists to the plate. -->
+    <!-- Stiffer solref="0.005 1" ensures the plate rigidly follows hand tilts without sagging. -->
+    <weld name="left_hand_weld" body1="l_wrist_yaw_link" body2="plate_assembly" relpose="0 0.25 -0.05 0 1 0 0" solref="0.005 1" solimp="0.99 0.999 0.001 0.5 2"/>
+    <weld name="right_hand_weld" body1="r_wrist_yaw_link" body2="plate_assembly" relpose="0 -0.25 -0.05 0 1 0 0" solref="0.005 1" solimp="0.99 0.999 0.001 0.5 2"/>
+  </equality>
+</mujoco>

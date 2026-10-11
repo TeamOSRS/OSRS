@@ -41,6 +41,18 @@ class OSRSLogger:
         else:
             self.logger.info(message)
 
+    def info(self, message: str):
+        self.log(message, "INFO")
+
+    def warning(self, message: str):
+        self.log(message, "WARNING")
+
+    def error(self, message: str):
+        self.log(message, "ERROR")
+
+    def debug(self, message: str):
+        self.log(message, "DEBUG")
+
     def get_logs(self, limit: int = 30) -> List[str]:
         """Returns the latest 'limit' logs."""
         with self._lock:

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Square, Settings, RefreshCw, BarChart2, Video, Compass, Crosshair, Cpu, Sliders } from "lucide-react";
+import { Play, Square, Settings, RefreshCw, BarChart2, Video, Compass, Crosshair, Cpu, Sliders, Activity, ShieldCheck, Scale, ArrowUpRight, Clock, Zap, CheckCircle2 } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 
 export default function BallBalancerResearch({ 
@@ -163,7 +163,7 @@ export default function BallBalancerResearch({
         body: JSON.stringify(calibration)
       });
       if (res.ok) {
-        alert("Calibration offsets saved to chiman_calibration.json successfully!");
+        alert("Calibration offsets saved to humanoid_calibration.json successfully!");
         fetchCalibration();
       } else {
         const err = await res.json();
@@ -534,9 +534,9 @@ export default function BallBalancerResearch({
 
   // Active Control Scenario state
   const activeScenario = balancerData?.data?.active_scenario || "NOMINAL";
-  let scenarioColorClass = "text-slate-400 bg-slate-500/10 border-slate-500/20";
+  let scenarioColorClass = "text-zinc-400 bg-slate-500/10 border-slate-500/20";
   if (activeScenario === "FINE_TUNING") {
-    scenarioColorClass = "text-[#CFFF3E] bg-[#CFFF3E]/10 border-[#CFFF3E]/20";
+    scenarioColorClass = "text-emerald-400 bg-emerald-400 text-black/10 border-emerald-500/20";
   } else if (activeScenario === "PREEMPTIVE_BRAKING") {
     scenarioColorClass = "text-sky-400 bg-sky-500/10 border-sky-500/20 animate-pulse";
   } else if (activeScenario === "EMERGENCY_RETRIEVE") {
@@ -561,19 +561,21 @@ export default function BallBalancerResearch({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
       
       {/* 1. Left Panel: Controller Configuration */}
-      <div className="bg-[#191A1B] p-5 rounded-2xl border border-slate-800 flex flex-col gap-4 text-slate-300">
-        <div className="flex items-center gap-2 text-white font-bold text-sm tracking-wider uppercase border-b border-slate-800 pb-2">
-          <Settings className="h-4 w-4 text-[#CFFF3E]" />
+      <div className="bg-[#090A0E] p-6 rounded-3xl border border-white/[0.08] shadow-2xl flex flex-col gap-5 text-zinc-300">
+        <div className="flex items-center gap-2.5 text-zinc-100 font-bold text-xs tracking-widest uppercase border-b border-white/[0.06] pb-3">
+          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <Settings className="h-3.5 w-3.5" />
+          </div>
           <span>Tuning Controls</span>
         </div>
 
         {/* Start / Stop Toggle */}
         <button
           onClick={() => onToggle(!active)}
-          className={`w-full py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition ${
+          className={`w-full py-3 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
             active 
-              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25" 
-              : "bg-[#1e293b] text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-800"
+              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:bg-emerald-500/25" 
+              : "bg-white/[0.04] text-zinc-400 border border-white/[0.08] hover:text-white hover:bg-white/[0.08]"
           }`}
         >
           {active ? (
@@ -591,7 +593,7 @@ export default function BallBalancerResearch({
 
         <button
           onClick={onGoToStart}
-          className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[11px] bg-white/[0.03] text-zinc-200 border border-white/[0.07] hover:bg-white/[0.08] hover:text-white active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           <span>Move to Start Pose</span>
@@ -599,17 +601,17 @@ export default function BallBalancerResearch({
 
         <button
           onClick={onInitializeArms}
-          className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[11px] bg-white/[0.03] text-zinc-200 border border-white/[0.07] hover:bg-white/[0.08] hover:text-white active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
-          <Compass className="h-3.5 w-3.5 text-[#B5ACF3]" />
+          <Compass className="h-3.5 w-3.5 text-indigo-400" />
           <span>Initialize Arm Position</span>
         </button>
 
         {/* Read-Only Feedback Provider Status (Hides force cells dropdown per requirements) */}
         <div className="flex flex-col gap-1.5 mt-2">
-          <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Feedback Provider</label>
-          <div className="bg-[#242628] border border-slate-700/80 rounded-xl px-3 py-2 text-white text-xs font-semibold flex items-center gap-2">
-            <Crosshair className="h-3.5 w-3.5 text-[#CFFF3E]" />
+          <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Feedback Provider</label>
+          <div className="bg-[#040407] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-zinc-200 text-xs font-semibold flex items-center gap-2.5">
+            <Crosshair className="h-3.5 w-3.5 text-emerald-400" />
             <span>Vision System (RealSense D415)</span>
           </div>
         </div>
@@ -618,7 +620,7 @@ export default function BallBalancerResearch({
         <div className="flex flex-col gap-3.5 mt-2">
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-400">Proportional Gain (Kp)</span>
+              <span className="text-zinc-400">Proportional Gain (Kp)</span>
               <span className="text-white font-mono">{kp.toFixed(2)}</span>
             </div>
             <input
@@ -632,13 +634,13 @@ export default function BallBalancerResearch({
               onMouseUp={handleSliderRelease}
               onTouchEnd={handleSliderRelease}
               onChange={(e) => setKp(parseFloat(e.target.value))}
-              className="accent-[#CFFF3E]"
+              className="accent-emerald-400"
             />
           </div>
 
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-400">Derivative Gain (Kd)</span>
+              <span className="text-zinc-400">Derivative Gain (Kd)</span>
               <span className="text-white font-mono">{kd.toFixed(2)}</span>
             </div>
             <input
@@ -652,13 +654,13 @@ export default function BallBalancerResearch({
               onMouseUp={handleSliderRelease}
               onTouchEnd={handleSliderRelease}
               onChange={(e) => setKd(parseFloat(e.target.value))}
-              className="accent-[#CFFF3E]"
+              className="accent-emerald-400"
             />
           </div>
 
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-400">Integral Gain (Ki)</span>
+              <span className="text-zinc-400">Integral Gain (Ki)</span>
               <span className="text-white font-mono">{ki.toFixed(3)}</span>
             </div>
             <input
@@ -672,19 +674,19 @@ export default function BallBalancerResearch({
               onMouseUp={handleSliderRelease}
               onTouchEnd={handleSliderRelease}
               onChange={(e) => setKi(parseFloat(e.target.value))}
-              className="accent-[#CFFF3E]"
+              className="accent-emerald-400"
             />
           </div>
         </div>
 
         {/* Speed Multiplier Slider */}
-        <div className="flex flex-col gap-1.5 mt-2 border-t border-slate-800 pt-4">
+        <div className="flex flex-col gap-1.5 mt-2 border-t border-white/[0.07] pt-4">
           <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-slate-400">Balancing Speed</span>
+            <span className="text-zinc-400">Balancing Speed</span>
             <span className={`font-mono px-2 py-0.5 rounded-md text-[10px] font-bold ${
               speed < 0.7 ? "text-sky-400 bg-sky-500/10" :
               speed > 1.4 ? "text-rose-400 bg-rose-500/10" :
-              "text-[#CFFF3E] bg-[#CFFF3E]/10"
+              "text-emerald-400 bg-emerald-400 text-black/10"
             }`}>
               {speed.toFixed(2)}x
             </span>
@@ -700,24 +702,24 @@ export default function BallBalancerResearch({
             onMouseUp={handleSliderRelease}
             onTouchEnd={handleSliderRelease}
             onChange={(e) => setSpeed(parseFloat(e.target.value))}
-            className="accent-[#CFFF3E] w-full"
+            className="accent-emerald-400 w-full"
           />
           <div className="flex justify-between text-[9px] text-slate-600 font-mono mt-0.5">
             <span>0.1x Cautious</span>
-            <span className="text-slate-500">1.0x Default</span>
+            <span className="text-zinc-500">1.0x Default</span>
             <span>2.0x Aggressive</span>
           </div>
         </div>
 
         {/* Max Tilt Sliders */}
-        <div className="flex flex-col gap-3.5 mt-2 border-t border-slate-800 pt-4">
-          <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Max Tilt Range</label>
+        <div className="flex flex-col gap-3.5 mt-2 border-t border-white/[0.07] pt-4">
+          <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Max Tilt Range</label>
 
           {/* Positive (up) tilt */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-400">Max Tilt Up (+)</span>
-              <span className="font-mono text-[#CFFF3E] bg-[#CFFF3E]/10 px-2 py-0.5 rounded-md text-[10px] font-bold">
+              <span className="text-zinc-400">Max Tilt Up (+)</span>
+              <span className="font-mono text-emerald-400 bg-emerald-400 text-black/10 px-2 py-0.5 rounded-md text-[10px] font-bold">
                 {maxTiltPos} units
               </span>
             </div>
@@ -732,11 +734,11 @@ export default function BallBalancerResearch({
               onMouseUp={handleSliderRelease}
               onTouchEnd={handleSliderRelease}
               onChange={(e) => setMaxTiltPos(parseInt(e.target.value))}
-              className="accent-[#CFFF3E] w-full"
+              className="accent-emerald-400 w-full"
             />
             <div className="flex justify-between text-[9px] text-slate-600 font-mono mt-0.5">
               <span>10 (Min)</span>
-              <span className="text-slate-500">150 (Default)</span>
+              <span className="text-zinc-500">150 (Default)</span>
               <span>400 (Max)</span>
             </div>
           </div>
@@ -744,8 +746,8 @@ export default function BallBalancerResearch({
           {/* Negative (down) tilt */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-400">Max Tilt Down (−)</span>
-              <span className="font-mono text-[#CFFF3E] bg-[#CFFF3E]/10 px-2 py-0.5 rounded-md text-[10px] font-bold">
+              <span className="text-zinc-400">Max Tilt Down (−)</span>
+              <span className="font-mono text-emerald-400 bg-emerald-400 text-black/10 px-2 py-0.5 rounded-md text-[10px] font-bold">
                 {maxTiltNeg} units
               </span>
             </div>
@@ -760,11 +762,11 @@ export default function BallBalancerResearch({
               onMouseUp={handleSliderRelease}
               onTouchEnd={handleSliderRelease}
               onChange={(e) => setMaxTiltNeg(parseInt(e.target.value))}
-              className="accent-[#CFFF3E] w-full"
+              className="accent-emerald-400 w-full"
             />
             <div className="flex justify-between text-[9px] text-slate-600 font-mono mt-0.5">
               <span>10 (Min)</span>
-              <span className="text-slate-500">178 (Default)</span>
+              <span className="text-zinc-500">178 (Default)</span>
               <span>400 (Max)</span>
             </div>
           </div>
@@ -772,19 +774,19 @@ export default function BallBalancerResearch({
 
         <button
           onClick={handleApplyConfig}
-          className="w-full bg-slate-800 text-white font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] mt-2 border border-slate-700/80 hover:bg-slate-750 transition"
+          className="w-full bg-emerald-500/10 text-emerald-400 font-bold uppercase tracking-wider py-2.5 rounded-xl text-[11px] mt-2 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-[0.98] transition-all"
         >
           Apply Tuning Profile
         </button>
 
         {/* Quick Presets Deck */}
-        <div className="flex flex-col gap-2 mt-2 border-t border-slate-800 pt-4">
-          <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Quick Target Presets</label>
+        <div className="flex flex-col gap-2 mt-2 border-t border-white/[0.07] pt-4">
+          <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Quick Target Presets</label>
           
           <button
             onClick={() => onSendCommand("both_arms")}
             disabled={!connected}
-            className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-slate-800 text-[#CFFF3E] border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+            className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-white/[0.04] text-emerald-400 border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
           >
             Go To Both Arms Pose
           </button>
@@ -793,14 +795,14 @@ export default function BallBalancerResearch({
             <button
               onClick={() => onSendCommand("left_pose")}
               disabled={!connected}
-              className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Left Arm Pose
             </button>
             <button
               onClick={() => onSendCommand("right_pose")}
               disabled={!connected}
-              className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Right Arm Pose
             </button>
@@ -810,21 +812,21 @@ export default function BallBalancerResearch({
             <button
               onClick={() => onSendCommand("tilt_up")}
               disabled={!connected}
-              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Tilt Up
             </button>
             <button
               onClick={() => onSendCommand("tilt_center")}
               disabled={!connected}
-              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Centre
             </button>
             <button
               onClick={() => onSendCommand("tilt_down")}
               disabled={!connected}
-              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Tilt Down
             </button>
@@ -834,14 +836,14 @@ export default function BallBalancerResearch({
             <button
               onClick={() => onSendCommand("gripper_open")}
               disabled={!connected}
-              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Open Gripper
             </button>
             <button
               onClick={() => onSendCommand("gripper_closed")}
               disabled={!connected}
-              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-white border border-slate-700/80 hover:bg-slate-700 transition disabled:opacity-40"
+              className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-white border border-white/[0.08]/80 hover:bg-slate-700 transition disabled:opacity-40"
             >
               Close Gripper
             </button>
@@ -850,13 +852,13 @@ export default function BallBalancerResearch({
       </div>
 
       {/* 2. Middle & Right merged: Research Applications Panel */}
-      <div className="lg:col-span-2 bg-[#191A1B] p-5 rounded-2xl border border-slate-800 flex flex-col gap-4 text-slate-300">
+      <div className="lg:col-span-2 bg-[#090A0E] p-6 rounded-3xl border border-white/[0.08] shadow-2xl flex flex-col gap-5 text-zinc-300">
         
         {/* Device Status Bar Mockup */}
         {activeApp !== "home" && (
-          <div className="flex justify-between items-center bg-[#151618] border border-slate-850 px-4 py-1.5 rounded-xl text-[10px] font-mono text-slate-500 select-none">
+          <div className="flex justify-between items-center bg-[#040407] border border-white/[0.06] px-4 py-1.5 rounded-xl text-[10px] font-mono text-zinc-500 select-none">
             <span>{timeString || "12:00 PM"}</span>
-            <span className="text-[#CFFF3E] font-bold tracking-wider uppercase text-[8px]">
+            <span className="text-emerald-400 font-bold tracking-wider uppercase text-[8px]">
               {activeApp === "vision" ? "Camera Vision App" :
                activeApp === "tune" ? "Physics Auto-Tuner App" :
                activeApp === "loadcell" ? "Load Cell Setup App" :
@@ -872,10 +874,10 @@ export default function BallBalancerResearch({
 
         {/* Back Navigation Action Bar */}
         {activeApp !== "home" && (
-          <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
             <button
               onClick={() => setActiveApp("home")}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition hover:scale-102 active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] hover:bg-slate-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition hover:scale-102 active:scale-95"
             >
               <span>← Back to Launcher</span>
             </button>
@@ -886,7 +888,7 @@ export default function BallBalancerResearch({
                   Playing Step {seqStatus.current_step}/{seqStatus.total_steps}
                 </span>
               )}
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest bg-[#040407] px-3 py-1 rounded-lg border border-white/[0.07]">
                 Pipeline: 30Hz
               </span>
             </div>
@@ -895,151 +897,245 @@ export default function BallBalancerResearch({
 
         {/* Launcher Home Screen App */}
         {activeApp === "home" && (
-          <div className="flex flex-col gap-6 animate-fade-in text-slate-300 w-full min-h-[500px]">
-            {/* Top widgets layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+          <div className="flex flex-col gap-6 animate-fade-in text-zinc-300 w-full">
+            {/* Top Telemetry Islands */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
-              {/* Clock Widget */}
-              <div className="bg-gradient-to-br from-slate-900/60 to-slate-950/60 backdrop-blur-xl border border-slate-850 p-6 rounded-3xl flex flex-col justify-center items-center text-center gap-2 min-h-[160px] relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#CFFF3E]/5 blur-3xl rounded-full" />
-                <span className="text-4xl md:text-5xl font-black tracking-tight text-white drop-shadow-md">
-                  {timeString || "12:00 PM"}
-                </span>
-                <span className="text-xs text-[#CFFF3E] font-bold uppercase tracking-wider">
-                  {dateString || "Loading Date..."}
-                </span>
-                <span className="text-[9px] text-slate-500 font-mono mt-1 uppercase tracking-widest">
-                  OSRS SMART ECOSYSTEM v1.4
-                </span>
-              </div>
-
-              {/* Status Widget */}
-              <div className="bg-[#1b1c1e]/60 backdrop-blur-xl border border-slate-850 p-6 rounded-3xl flex flex-col justify-between min-h-[160px] shadow-2xl">
+              {/* Telemetry Island 1: Perception & Stabilization */}
+              <div className="bg-[#040407] border border-white/[0.08] p-5 rounded-2xl flex flex-col justify-between gap-4 shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/[0.03] blur-3xl rounded-full pointer-events-none" />
+                
                 <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">System Connectivity</span>
-                    <span className={`text-sm font-black mt-0.5 ${connected ? "text-emerald-400" : "text-rose-400"}`}>
-                      {connected ? "● Connected" : "● Offline"}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">Active Perception & Stabilization</span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                    Pipeline: 30Hz
+                  <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-2.5 py-1 rounded-lg border border-white/[0.06] flex items-center gap-1.5">
+                    <Clock className="w-3 h-3 text-zinc-400" />
+                    {timeString || "12:00 PM"}
                   </span>
                 </div>
-                
-                <div className="flex justify-between items-end border-t border-slate-850/60 pt-4 mt-2 font-mono text-[10px]">
-                  <div className="flex flex-col">
-                    <span className="text-slate-500">Feedback Provider</span>
-                    <span className="text-[#CFFF3E] font-bold uppercase mt-0.5">
-                      {balancerData?.provider === "vision" ? "Camera Vision" : balancerData?.provider === "force" ? "Load Cell Sensors" : "Fusion"}
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/[0.06]">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Feedback Provider</span>
+                    <span className="text-xs font-bold text-zinc-200 flex items-center gap-1 mt-0.5">
+                      <Video className="w-3.5 h-3.5 text-sky-400" />
+                      {balancerData?.provider === "vision" ? "Camera Vision" : balancerData?.provider === "force" ? "Load Cell Sensors" : "Vision (RealSense)"}
                     </span>
                   </div>
-                  <div className="flex flex-col text-right">
-                    <span className="text-slate-500">Ball Stability</span>
-                    <span className="text-white font-bold mt-0.5">
+
+                  <div className="flex flex-col gap-0.5 text-right">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Stability State</span>
+                    <span className={`text-xs font-bold mt-0.5 inline-flex items-center justify-end gap-1 ${hasBall ? "text-emerald-400" : "text-amber-400"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${hasBall ? "bg-emerald-400" : "bg-amber-400"}`} />
                       {balancerData?.exploration_mode 
-                        ? `${Math.round((balancerData?.exploration_progress ?? 0) * 100)}%` 
-                        : (hasBall ? "Stabilizing" : "No Ball Detected")
+                        ? `Learning (${Math.round((balancerData?.exploration_progress ?? 0) * 100)}%)` 
+                        : (hasBall ? "Target Stabilizing" : "No Ball Detected")
                       }
                     </span>
                   </div>
+
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Control Loop</span>
+                    <span className="text-xs font-mono font-semibold text-zinc-300 flex items-center gap-1 mt-0.5">
+                      <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                      30 Hz (dt: 33.3ms)
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-0.5 text-right">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Active Scenario</span>
+                    <span className="text-xs font-bold text-zinc-300 mt-0.5">
+                      {activeScenario.replace("_", " ")}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Telemetry Island 2: Hardware Bus & Safety */}
+              <div className="bg-[#040407] border border-white/[0.08] p-5 rounded-2xl flex flex-col justify-between gap-4 shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/[0.03] blur-3xl rounded-full pointer-events-none" />
+                
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-400" : "bg-rose-400"}`} />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">Hardware Bus & Safety</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" />
+                    OSRS Guard Active
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/[0.06]">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Dynamixel Bus</span>
+                    <span className={`text-xs font-bold mt-0.5 ${connected ? "text-emerald-400" : "text-rose-400"}`}>
+                      {connected ? "● Connected (COM9)" : "● Offline (Disconnected)"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-0.5 text-right">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Load Cells</span>
+                    <span className="text-xs font-semibold text-zinc-300 mt-0.5">
+                      HX711 (Calibrated)
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Max Tilt Envelope</span>
+                    <span className="text-xs font-mono font-semibold text-zinc-300 mt-0.5">
+                      -{maxTiltNeg} to +{maxTiltPos} units
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-0.5 text-right">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-400">Auto-Tune State</span>
+                    <span className="text-xs font-bold text-zinc-300 mt-0.5">
+                      {autoTune ? "Enabled (Adapting)" : "Manual Tuning Mode"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            {/* App Icons Grid */}
-            <div className="flex flex-col gap-3 mt-4">
-              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider font-mono px-1"> E-SYSTEM APPLICATIONS </span>
+            {/* Research Module Applications Grid */}
+            <div className="flex flex-col gap-3 mt-1">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs uppercase font-bold text-zinc-400 tracking-wider">Research Diagnostic & Control Modules</span>
+                <span className="text-[10px] font-mono text-zinc-400">6 Applications Available</span>
+              </div>
               
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 
-                {/* App 1: Vision Stream */}
+                {/* App 1: Camera Vision */}
                 <div 
                   onClick={() => setActiveApp("vision")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-sky-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-sky-500/10 text-sky-400 group-hover:bg-sky-500/25 transition">
-                    <Video className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:scale-105 transition-transform">
+                      <Video className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">Camera Vision</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-sky-300 transition-colors">Camera Vision</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">RealSense RGB-D stream, optical HSV segmentation & ray-plane projection.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Optical Perception</span>
+                    <span className="text-sky-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
                 {/* App 2: PID Controller */}
                 <div 
                   onClick={() => setActiveApp("tune")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-amber-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/25 transition">
-                    <Sliders className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform">
+                      <Sliders className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">PID Controls</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-amber-300 transition-colors">PID Controls</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">Closed-loop gains, step response tracking, deadzone & settling curves.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Closed-Loop Tuning</span>
+                    <span className="text-amber-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
                 {/* App 3: Model Training */}
                 <div 
                   onClick={() => setActiveApp("training")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-purple-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-fuchsia-500/10 text-fuchsia-400 group-hover:bg-fuchsia-500/25 transition">
-                    <Cpu className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 group-hover:scale-105 transition-transform">
+                      <Cpu className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-purple-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">Model Training</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-purple-300 transition-colors">Model Training</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">Adaptive policy learning, polynomial fitting & dynamics calibration.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Adaptive Control</span>
+                    <span className="text-purple-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
                 {/* App 4: Load Cell Settings */}
                 <div 
                   onClick={() => setActiveApp("loadcell")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-indigo-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/25 transition">
-                    <Settings className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform">
+                      <Scale className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">Load Cells</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-indigo-300 transition-colors">Load Cells</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">HX711 dual strain gauge force sensing, tare offset & port selection.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Force Feedback</span>
+                    <span className="text-indigo-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
                 {/* App 5: Pose Sequences */}
                 <div 
                   onClick={() => setActiveApp("sequence")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-teal-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-teal-500/10 text-teal-400 group-hover:bg-teal-500/25 transition">
-                    <Crosshair className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 group-hover:scale-105 transition-transform">
+                      <Crosshair className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">Pose Editor</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-teal-300 transition-colors">Pose Editor</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">Multi-waypoint balancing choreography, custom plate tilt sequences.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Motion Sequencing</span>
+                    <span className="text-teal-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
                 {/* App 6: Arm Calibration */}
                 <div 
                   onClick={() => setActiveApp("calibration")}
-                  className="bg-slate-900/40 backdrop-blur-md border border-slate-850/80 p-4 rounded-2xl flex flex-col items-center justify-center gap-2.5 hover:bg-[#CFFF3E]/10 hover:border-[#CFFF3E]/20 hover:scale-105 active:scale-95 transition cursor-pointer text-center group aspect-square max-w-[120px] mx-auto w-full shadow-lg"
+                  className="bg-[#040407] hover:bg-[#0D0F14] border border-white/[0.07] hover:border-rose-500/30 p-4 rounded-2xl flex flex-col justify-between gap-3 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 shadow-lg"
                 >
-                  <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-400 group-hover:bg-rose-500/25 transition">
-                    <Compass className="h-6 w-6" />
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 group-hover:scale-105 transition-transform">
+                      <Compass className="h-5 w-5" />
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-zinc-500 group-hover:text-rose-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </div>
-                  <span className="text-[10px] font-black uppercase text-slate-350 tracking-wider leading-none">Arm Calib</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100 group-hover:text-rose-300 transition-colors">Arm Calibration</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">Direct joint zero-points, kinematic verification & DLS solver alignment.</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-zinc-400">
+                    <span>Kinematics Zeroing</span>
+                    <span className="text-rose-400 font-semibold group-hover:underline">Launch →</span>
+                  </div>
                 </div>
 
-              </div>
-            </div>
-
-            {/* Android Home Screen Dock */}
-            <div className="mt-auto pt-6 border-t border-slate-850/60 w-full max-w-[520px] mx-auto pb-2">
-              <div className="bg-slate-900/50 backdrop-blur-2xl border border-slate-800/80 p-3 rounded-2xl flex justify-around items-center shadow-xl">
-                <div onClick={() => setActiveApp("vision")} className="p-2 rounded-xl text-sky-400 hover:bg-sky-500/10 active:scale-90 transition cursor-pointer" title="Vision">
-                  <Video className="h-5 w-5" />
-                </div>
-                <div onClick={() => setActiveApp("tune")} className="p-2 rounded-xl text-amber-400 hover:bg-amber-500/10 active:scale-90 transition cursor-pointer" title="PID Controls">
-                  <Sliders className="h-5 w-5" />
-                </div>
-                <div onClick={() => setActiveApp("training")} className="p-2 rounded-xl text-fuchsia-400 hover:bg-fuchsia-500/10 active:scale-90 transition cursor-pointer" title="Model Training">
-                  <Cpu className="h-5 w-5" />
-                </div>
-                <div onClick={() => setActiveApp("loadcell")} className="p-2 rounded-xl text-purple-400 hover:bg-purple-500/10 active:scale-90 transition cursor-pointer" title="Load Cells">
-                  <Settings className="h-5 w-5" />
-                </div>
-                <div onClick={() => setActiveApp("calibration")} className="p-2 rounded-xl text-rose-400 hover:bg-rose-500/10 active:scale-90 transition cursor-pointer" title="Arm Calibration">
-                  <Compass className="h-5 w-5" />
-                </div>
               </div>
             </div>
           </div>
@@ -1051,7 +1147,7 @@ export default function BallBalancerResearch({
             
             {/* Live Feed Monitor */}
             {cameraActive && videoFrame ? (
-              <div className="relative border border-slate-800 rounded-xl overflow-hidden bg-black max-w-full flex items-center justify-center">
+              <div className="relative border border-white/[0.07] rounded-xl overflow-hidden bg-black max-w-full flex items-center justify-center">
                 <img 
                   src={`data:image/jpeg;base64,${videoFrame}`} 
                   className="w-full max-h-[360px] object-contain block" 
@@ -1073,17 +1169,17 @@ export default function BallBalancerResearch({
                 </div>
               </div>
             ) : (
-              <div className="w-full h-[280px] border border-slate-800 rounded-xl bg-[#161719] flex flex-col items-center justify-center gap-4 text-center px-4">
+              <div className="w-full h-[280px] border border-white/[0.07] rounded-xl bg-[#040407] flex flex-col items-center justify-center gap-4 text-center px-4">
                 <div className="p-4 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 animate-pulse">
                   <Video className="h-8 w-8" />
                 </div>
                 <div>
                   <h4 className="font-bold text-white text-sm">RealSense D415i Camera Offline</h4>
-                  <p className="text-[10px] text-slate-500 max-w-[240px] mt-1 mx-auto">The background vision acquisition pipeline is stopped. Enable camera stream to view live feedback and coordinates.</p>
+                  <p className="text-[10px] text-zinc-500 max-w-[240px] mt-1 mx-auto">The background vision acquisition pipeline is stopped. Enable camera stream to view live feedback and coordinates.</p>
                 </div>
                 <button
                   onClick={onToggleVision}
-                  className="bg-[#CFFF3E] text-slate-900 text-[10px] uppercase font-black px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition"
+                  className="bg-emerald-400 text-black text-slate-900 text-[10px] uppercase font-black px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition"
                 >
                   Power On RealSense D415 Camera
                 </button>
@@ -1094,34 +1190,34 @@ export default function BallBalancerResearch({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               {/* Box 1: Coordinates relative to Plate Center */}
-              <div className="bg-[#202123] border border-slate-800/80 p-4 rounded-xl flex flex-col gap-2">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Plate Center Origin (Physical)</span>
+              <div className="bg-[#040407] border border-white/[0.07]/80 p-4 rounded-xl flex flex-col gap-2">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Plate Center Origin (Physical)</span>
                 <div className="flex flex-col gap-1 mt-1 font-mono">
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Plate Dimensions</span>
-                    <span className="text-slate-300">380 x 50 mm (Inner)</span>
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Plate Dimensions</span>
+                    <span className="text-zinc-300">380 x 50 mm (Inner)</span>
                   </div>
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Ball Y (Longitudinal)</span>
-                    <span className="text-[#CFFF3E] font-bold">
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Ball Y (Longitudinal)</span>
+                    <span className="text-emerald-400 font-bold">
                       {hasBall ? `${(ballY3d * 1000.0).toFixed(1)} mm` : "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Ball X (Transverse)</span>
-                    <span className="text-[#CFFF3E] font-bold">
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Ball X (Transverse)</span>
+                    <span className="text-emerald-400 font-bold">
                       {hasBall ? `${(ballX3d * 1000.0).toFixed(1)} mm` : "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Decision State</span>
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Decision State</span>
                     <span className={`font-bold uppercase ${hasBall ? (isCenter ? "text-emerald-400" : "text-amber-400") : "text-red-400"}`}>
                       {ballSide}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pt-1 font-mono">
-                    <span className="text-slate-500">Control Model</span>
-                    <span className={`font-bold uppercase ${activeScenario === "NOMINAL" ? "text-slate-400" : activeScenario === "FINE_TUNING" ? "text-[#CFFF3E]" : "text-amber-400 animate-pulse"}`}>
+                    <span className="text-zinc-500">Control Model</span>
+                    <span className={`font-bold uppercase ${activeScenario === "NOMINAL" ? "text-zinc-400" : activeScenario === "FINE_TUNING" ? "text-emerald-400" : "text-amber-400 animate-pulse"}`}>
                       {activeScenario.replace("_", " ")}
                     </span>
                   </div>
@@ -1129,21 +1225,21 @@ export default function BallBalancerResearch({
               </div>
 
               {/* Box 2: Optical Coordinates & Scale */}
-              <div className="bg-[#202123] border border-slate-800/80 p-4 rounded-xl flex flex-col gap-2">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Optical telemetry & scaling</span>
+              <div className="bg-[#040407] border border-white/[0.07]/80 p-4 rounded-xl flex flex-col gap-2">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Optical telemetry & scaling</span>
                 <div className="flex flex-col gap-1 mt-1 font-mono">
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Raw Pixel Offset</span>
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Raw Pixel Offset</span>
                     <span className="text-white">{hasBall ? `${xPx} px` : "0 px"}</span>
                   </div>
-                  <div className="flex justify-between text-xs border-b border-slate-800/60 pb-1">
-                    <span className="text-slate-500">Dynamic Resolution Scale</span>
+                  <div className="flex justify-between text-xs border-b border-white/[0.07]/60 pb-1">
+                    <span className="text-zinc-500">Dynamic Resolution Scale</span>
                     <span className="text-white">
                       {visDetails.plate_center ? `${(384.0 / (visDetails.plate_width || 640)).toFixed(3)} mm/px` : "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">Depth (Z Position)</span>
+                    <span className="text-zinc-500">Depth (Z Position)</span>
                     <span className="text-white">{hasBall ? `${(zMm).toFixed(1)} mm` : "0.0 mm"}</span>
                   </div>
                 </div>
@@ -1152,15 +1248,15 @@ export default function BallBalancerResearch({
             </div>
 
             {/* Camera settings & filters card deck (OSRS style) */}
-            <div className="bg-[#202123] border border-slate-800/80 rounded-xl overflow-hidden mt-2">
+            <div className="bg-[#040407] border border-white/[0.07]/80 rounded-xl overflow-hidden mt-2">
               {/* Tab Selector */}
-              <div className="flex border-b border-slate-800/60 bg-[#161719] p-2 gap-1.5">
+              <div className="flex border-b border-white/[0.07]/60 bg-[#040407] p-2 gap-1.5">
                 <button
                   onClick={() => setActiveSettingsTab("camera")}
                   className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition ${
                     activeSettingsTab === "camera"
-                      ? "bg-[#CFFF3E] text-slate-900 font-extrabold shadow"
-                      : "bg-slate-900/60 text-slate-400 hover:text-white"
+                      ? "bg-emerald-400 text-black text-slate-900 font-extrabold shadow"
+                      : "bg-[#040407]/60 text-zinc-400 hover:text-white"
                   }`}
                 >
                   Camera Settings
@@ -1169,8 +1265,8 @@ export default function BallBalancerResearch({
                   onClick={() => setActiveSettingsTab("color")}
                   className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition ${
                     activeSettingsTab === "color"
-                      ? "bg-[#CFFF3E] text-slate-900 font-extrabold shadow"
-                      : "bg-slate-900/60 text-slate-400 hover:text-white"
+                      ? "bg-emerald-400 text-black text-slate-900 font-extrabold shadow"
+                      : "bg-[#040407]/60 text-zinc-400 hover:text-white"
                   }`}
                 >
                   Color Tuning (HSV)
@@ -1179,8 +1275,8 @@ export default function BallBalancerResearch({
                   onClick={() => setActiveSettingsTab("filter")}
                   className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition ${
                     activeSettingsTab === "filter"
-                      ? "bg-[#CFFF3E] text-slate-900 font-extrabold shadow"
-                      : "bg-slate-900/60 text-slate-400 hover:text-white"
+                      ? "bg-emerald-400 text-black text-slate-900 font-extrabold shadow"
+                      : "bg-[#040407]/60 text-zinc-400 hover:text-white"
                   }`}
                 >
                   Coordinate Filters
@@ -1194,11 +1290,11 @@ export default function BallBalancerResearch({
                     {/* Column 1: Options */}
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-col gap-1">
-                        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-mono">Visual Preset</label>
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 font-mono">Visual Preset</label>
                         <select
                           value={balancerData?.vision_details?.camera_settings?.visual_preset ?? 1}
                           onChange={(e) => updateCameraSettings({ visual_preset: parseInt(e.target.value) })}
-                          className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#CFFF3E] cursor-pointer"
+                          className="bg-[#040407] border border-white/[0.07] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
                           <option value={0}>Custom (0)</option>
                           <option value={1}>Default (1)</option>
@@ -1210,11 +1306,11 @@ export default function BallBalancerResearch({
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-mono">IR Projector / Emitter</label>
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 font-mono">IR Projector / Emitter</label>
                         <select
                           value={balancerData?.vision_details?.camera_settings?.emitter_state ?? 1}
                           onChange={(e) => updateCameraSettings({ emitter_state: parseInt(e.target.value) })}
-                          className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#CFFF3E] cursor-pointer"
+                          className="bg-[#040407] border border-white/[0.07] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
                           <option value={0}>Disabled (Off)</option>
                           <option value={1}>Enabled (Laser Projector)</option>
@@ -1224,8 +1320,8 @@ export default function BallBalancerResearch({
 
                       <div className="flex flex-col gap-1">
                         <div className="flex justify-between items-center text-[10px] font-mono">
-                          <span className="font-bold text-slate-400 uppercase tracking-wider">Laser Projector Power</span>
-                          <span className="text-[#CFFF3E] font-bold">{laserPower} mW</span>
+                          <span className="font-bold text-zinc-400 uppercase tracking-wider">Laser Projector Power</span>
+                          <span className="text-emerald-400 font-bold">{laserPower} mW</span>
                         </div>
                         <input
                           type="range"
@@ -1236,28 +1332,28 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ laser_power: laserPower }); }}
                           onChange={(e) => setLaserPower(parseInt(e.target.value))}
-                          className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                         />
                       </div>
                     </div>
 
                     {/* Column 2: Exposure & WB */}
                     <div className="flex flex-col gap-3">
-                      <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-3">
+                      <div className="bg-[#040407]/60 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                          <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-mono">Auto Exposure</label>
+                          <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 font-mono">Auto Exposure</label>
                           <input
                             type="checkbox"
                             checked={balancerData?.vision_details?.camera_settings?.auto_exposure ?? true}
                             onChange={(e) => updateCameraSettings({ auto_exposure: e.target.checked })}
-                            className="w-4 h-4 accent-[#CFFF3E] rounded cursor-pointer"
+                            className="w-4 h-4 accent-emerald-400 rounded cursor-pointer"
                           />
                         </div>
                         {!(balancerData?.vision_details?.camera_settings?.auto_exposure ?? true) && (
                           <div className="flex flex-col gap-1 mt-1">
                             <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-slate-400">Exposure Time</span>
-                              <span className="text-[#CFFF3E] font-bold">{exposure} us</span>
+                              <span className="text-zinc-400">Exposure Time</span>
+                              <span className="text-emerald-400 font-bold">{exposure} us</span>
                             </div>
                             <input
                               type="range"
@@ -1268,27 +1364,27 @@ export default function BallBalancerResearch({
                               onMouseDown={() => { isDraggingRef.current = true; }}
                               onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ exposure_us: exposure }); }}
                               onChange={(e) => setExposure(parseInt(e.target.value))}
-                              className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                              className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                             />
                           </div>
                         )}
                       </div>
 
-                      <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-3">
+                      <div className="bg-[#040407]/60 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                          <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-mono">Auto White Balance</label>
+                          <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 font-mono">Auto White Balance</label>
                           <input
                             type="checkbox"
                             checked={balancerData?.vision_details?.camera_settings?.auto_white_balance ?? true}
                             onChange={(e) => updateCameraSettings({ auto_white_balance: e.target.checked })}
-                            className="w-4 h-4 accent-[#CFFF3E] rounded cursor-pointer"
+                            className="w-4 h-4 accent-emerald-400 rounded cursor-pointer"
                           />
                         </div>
                         {!(balancerData?.vision_details?.camera_settings?.auto_white_balance ?? true) && (
                           <div className="flex flex-col gap-1 mt-1">
                             <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-slate-400">White Balance</span>
-                              <span className="text-[#CFFF3E] font-bold">{whiteBalance} K</span>
+                              <span className="text-zinc-400">White Balance</span>
+                              <span className="text-emerald-400 font-bold">{whiteBalance} K</span>
                             </div>
                             <input
                               type="range"
@@ -1299,7 +1395,7 @@ export default function BallBalancerResearch({
                               onMouseDown={() => { isDraggingRef.current = true; }}
                               onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ white_balance_temp: whiteBalance }); }}
                               onChange={(e) => setWhiteBalance(parseInt(e.target.value))}
-                              className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                              className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                             />
                           </div>
                         )}
@@ -1310,14 +1406,14 @@ export default function BallBalancerResearch({
 
                 {activeSettingsTab === "color" && (
                   <div className="flex flex-col gap-3">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-mono">Tuning Ball Color Thresholds (HSV)</span>
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">Tuning Ball Color Thresholds (HSV)</span>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Hue Sliders */}
-                      <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-2">
+                      <div className="bg-[#040407]/40 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2">
                         <div className="flex justify-between items-center text-[10px] font-mono">
-                          <span className="text-slate-400">Min Hue (Color tint)</span>
-                          <span className="text-[#CFFF3E] font-bold">{hMin}</span>
+                          <span className="text-zinc-400">Min Hue (Color tint)</span>
+                          <span className="text-emerald-400 font-bold">{hMin}</span>
                         </div>
                         <input
                           type="range"
@@ -1327,12 +1423,12 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, h_low: hMin } }); }}
                           onChange={(e) => setHMin(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                         />
 
                         <div className="flex justify-between items-center text-[10px] font-mono mt-1">
-                          <span className="text-slate-400">Max Hue</span>
-                          <span className="text-[#CFFF3E] font-bold">{hMax}</span>
+                          <span className="text-zinc-400">Max Hue</span>
+                          <span className="text-emerald-400 font-bold">{hMax}</span>
                         </div>
                         <input
                           type="range"
@@ -1342,15 +1438,15 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, h_high: hMax } }); }}
                           onChange={(e) => setHMax(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                         />
                       </div>
 
                       {/* Saturation Sliders */}
-                      <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-2">
+                      <div className="bg-[#040407]/40 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2">
                         <div className="flex justify-between items-center text-[10px] font-mono">
-                          <span className="text-slate-400">Min Saturation (Vibrancy)</span>
-                          <span className="text-[#CFFF3E] font-bold">{sMin}</span>
+                          <span className="text-zinc-400">Min Saturation (Vibrancy)</span>
+                          <span className="text-emerald-400 font-bold">{sMin}</span>
                         </div>
                         <input
                           type="range"
@@ -1360,12 +1456,12 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, s_low: sMin } }); }}
                           onChange={(e) => setSMin(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                         />
 
                         <div className="flex justify-between items-center text-[10px] font-mono mt-1">
-                          <span className="text-slate-400">Max Saturation</span>
-                          <span className="text-[#CFFF3E] font-bold">{sMax}</span>
+                          <span className="text-zinc-400">Max Saturation</span>
+                          <span className="text-emerald-400 font-bold">{sMax}</span>
                         </div>
                         <input
                           type="range"
@@ -1375,15 +1471,15 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, s_high: sMax } }); }}
                           onChange={(e) => setSMax(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                         />
                       </div>
 
                       {/* Value Sliders */}
-                      <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-2 sm:col-span-2">
+                      <div className="bg-[#040407]/40 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2 sm:col-span-2">
                         <div className="flex justify-between items-center text-[10px] font-mono">
-                          <span className="text-slate-400">Min Value (Brightness)</span>
-                          <span className="text-[#CFFF3E] font-bold">{vMin}</span>
+                          <span className="text-zinc-400">Min Value (Brightness)</span>
+                          <span className="text-emerald-400 font-bold">{vMin}</span>
                         </div>
                         <input
                           type="range"
@@ -1393,12 +1489,12 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, v_low: vMin } }); }}
                           onChange={(e) => setVMin(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none w-full"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none w-full"
                         />
 
                         <div className="flex justify-between items-center text-[10px] font-mono mt-1">
-                          <span className="text-slate-400">Max Value</span>
-                          <span className="text-[#CFFF3E] font-bold">{vMax}</span>
+                          <span className="text-zinc-400">Max Value</span>
+                          <span className="text-emerald-400 font-bold">{vMax}</span>
                         </div>
                         <input
                           type="range"
@@ -1408,7 +1504,7 @@ export default function BallBalancerResearch({
                           onMouseDown={() => { isDraggingRef.current = true; }}
                           onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ hsv_bounds: { ...balancerData?.vision_details?.camera_settings?.hsv_bounds, v_high: vMax } }); }}
                           onChange={(e) => setVMax(parseInt(e.target.value))}
-                          className="accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none w-full"
+                          className="accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none w-full"
                         />
                       </div>
                     </div>
@@ -1419,11 +1515,11 @@ export default function BallBalancerResearch({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-col gap-1">
-                        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-mono">Motion Filter Type</label>
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 font-mono">Motion Filter Type</label>
                         <select
                           value={balancerData?.vision_details?.camera_settings?.filter_mode ?? "moving_average"}
                           onChange={(e) => updateCameraSettings({ filter_mode: e.target.value })}
-                          className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#CFFF3E] cursor-pointer"
+                          className="bg-[#040407] border border-white/[0.07] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
                           <option value="none">None (No Smoothing)</option>
                           <option value="moving_average">Moving Average Filter</option>
@@ -1434,8 +1530,8 @@ export default function BallBalancerResearch({
                       {(balancerData?.vision_details?.camera_settings?.filter_mode ?? "moving_average") === "moving_average" && (
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[10px] font-mono">
-                            <span className="text-slate-400">Smoothing Window Size</span>
-                            <span className="text-[#CFFF3E] font-bold">{filterWindow} frames</span>
+                            <span className="text-zinc-400">Smoothing Window Size</span>
+                            <span className="text-emerald-400 font-bold">{filterWindow} frames</span>
                           </div>
                           <input
                             type="range"
@@ -1446,7 +1542,7 @@ export default function BallBalancerResearch({
                             onMouseDown={() => { isDraggingRef.current = true; }}
                             onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ filter_window: filterWindow }); }}
                             onChange={(e) => setFilterWindow(parseInt(e.target.value))}
-                            className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                            className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                           />
                         </div>
                       )}
@@ -1454,11 +1550,11 @@ export default function BallBalancerResearch({
 
                     <div className="flex flex-col gap-3">
                       {(balancerData?.vision_details?.camera_settings?.filter_mode) === "kalman" && (
-                        <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-3">
+                        <div className="bg-[#040407]/60 p-3 rounded-xl border border-white/[0.07]/80 flex flex-col gap-3">
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-slate-400">Process Noise Covariance (Q)</span>
-                              <span className="text-[#CFFF3E] font-bold">{processNoise.toExponential(1)}</span>
+                              <span className="text-zinc-400">Process Noise Covariance (Q)</span>
+                              <span className="text-emerald-400 font-bold">{processNoise.toExponential(1)}</span>
                             </div>
                             <input
                               type="range"
@@ -1469,14 +1565,14 @@ export default function BallBalancerResearch({
                               onMouseDown={() => { isDraggingRef.current = true; }}
                               onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ filter_process_noise: Math.pow(10, Math.log10(processNoise)) }); }}
                               onChange={(e) => setProcessNoise(Math.pow(10, parseFloat(e.target.value)))}
-                              className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                              className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                             />
                           </div>
 
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-slate-400">Measurement Noise Covariance (R)</span>
-                              <span className="text-[#CFFF3E] font-bold">{measurementNoise.toExponential(1)}</span>
+                              <span className="text-zinc-400">Measurement Noise Covariance (R)</span>
+                              <span className="text-emerald-400 font-bold">{measurementNoise.toExponential(1)}</span>
                             </div>
                             <input
                               type="range"
@@ -1487,7 +1583,7 @@ export default function BallBalancerResearch({
                               onMouseDown={() => { isDraggingRef.current = true; }}
                               onMouseUp={() => { isDraggingRef.current = false; updateCameraSettings({ filter_measurement_noise: Math.pow(10, Math.log10(measurementNoise)) }); }}
                               onChange={(e) => setMeasurementNoise(Math.pow(10, parseFloat(e.target.value)))}
-                              className="w-full accent-[#CFFF3E] cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                              className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/[0.04] rounded-lg appearance-none"
                             />
                           </div>
                         </div>
@@ -1506,8 +1602,8 @@ export default function BallBalancerResearch({
           <div className="flex flex-col gap-4">
             
             {/* Chart Area */}
-            <div className="bg-[#161719] p-4 rounded-xl border border-slate-800">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 block">PID Error Response Log</span>
+            <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]">
+              <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider mb-2 block">PID Error Response Log</span>
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={history}>
@@ -1524,20 +1620,20 @@ export default function BallBalancerResearch({
 
             {/* Diagnostic Metrics underneath graph */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs mt-1">
-              <div className="bg-[#202123] p-3.5 rounded-xl border border-slate-800/80 flex flex-col gap-1 font-mono">
-                <span className="text-slate-500 text-[9px] font-bold uppercase tracking-wider">Plate Axis Error</span>
+              <div className="bg-[#040407] p-3.5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-1 font-mono">
+                <span className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Plate Axis Error</span>
                 <span className="text-white font-bold text-sm">
                   {Math.round((balancerData?.data?.ball_y ?? 0.0) * 1000)} mm
                 </span>
               </div>
-              <div className="bg-[#202123] p-3.5 rounded-xl border border-slate-800/80 flex flex-col gap-1 font-mono">
-                <span className="text-slate-500 text-[9px] font-bold uppercase tracking-wider">Controller Action</span>
-                <span className="text-[#CFFF3E] font-bold text-sm">
+              <div className="bg-[#040407] p-3.5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-1 font-mono">
+                <span className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Controller Action</span>
+                <span className="text-emerald-400 font-bold text-sm">
                   {Math.round((balancerData?.data?.delta_z ?? 0.0) * 1000)} mm tilt
                 </span>
               </div>
-              <div className="bg-[#202123] p-3.5 rounded-xl border border-slate-800/80 flex flex-col gap-1 font-mono">
-                <span className="text-slate-500 text-[9px] font-bold uppercase tracking-wider">Confidence Index</span>
+              <div className="bg-[#040407] p-3.5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-1 font-mono">
+                <span className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Confidence Index</span>
                 <span className="text-[#B5ACF3] font-bold text-sm">
                   {Math.round((balancerData?.data?.confidence ?? 0.0) * 100)} %
                 </span>
@@ -1545,10 +1641,10 @@ export default function BallBalancerResearch({
             </div>
 
             {/* Direction Inversion Card */}
-            <div className="bg-[#202123] p-4 rounded-xl border border-slate-800 flex justify-between items-center mt-1">
+            <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07] flex justify-between items-center mt-1">
               <div>
                 <span className="text-white font-bold text-xs uppercase tracking-wide block">Invert Balancer Output Direction</span>
-                <span className="text-[10px] text-slate-500 mt-0.5 block">
+                <span className="text-[10px] text-zinc-500 mt-0.5 block">
                   Toggle this if the plate tilts in the opposite direction of the ball error.
                 </span>
               </div>
@@ -1569,7 +1665,7 @@ export default function BallBalancerResearch({
                 className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   invertOutput
                     ? "bg-rose-500 text-white shadow-lg shadow-rose-950/40 hover:bg-rose-400"
-                    : "bg-slate-800 text-slate-400 hover:text-white"
+                    : "bg-white/[0.04] text-zinc-400 hover:text-white"
                 }`}
               >
                 {invertOutput ? "Direction: Inverted" : "Direction: Normal"}
@@ -1581,23 +1677,23 @@ export default function BallBalancerResearch({
 
         {/* Model Training Application */}
         {activeApp === "training" && (
-          <div className="flex flex-col gap-6 animate-fade-in text-slate-300">
+          <div className="flex flex-col gap-6 animate-fade-in text-zinc-300">
             
             {/* 1. Online Self-Tuning & System Identification Panel */}
-            <div className="bg-[#202123] border border-slate-800 p-5 rounded-xl flex flex-col gap-4">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+            <div className="bg-[#040407] border border-white/[0.07] p-5 rounded-xl flex flex-col gap-4">
+              <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
                 <div className="flex items-center gap-2">
-                  <div className={`h-2.5 w-2.5 rounded-full ${autoTune ? "bg-[#CFFF3E] animate-pulse" : "bg-slate-600"}`} />
+                  <div className={`h-2.5 w-2.5 rounded-full ${autoTune ? "bg-emerald-400 text-black animate-pulse" : "bg-slate-600"}`} />
                   <span className="text-xs uppercase font-bold text-white tracking-wider">Online Model Learning & Diagnostics</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-500 font-mono uppercase font-bold">Self-Learning Auto-Tune</span>
+                  <span className="text-[10px] text-zinc-500 font-mono uppercase font-bold">Self-Learning Auto-Tune</span>
                   <button
                     onClick={() => handleToggleAutoTune(!autoTune)}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${
                       autoTune 
-                        ? "bg-[#CFFF3E] text-slate-900 shadow hover:scale-105" 
-                        : "bg-slate-800 text-slate-400 hover:text-white"
+                        ? "bg-emerald-400 text-black text-slate-900 shadow hover:scale-105" 
+                        : "bg-white/[0.04] text-zinc-400 hover:text-white"
                     }`}
                   >
                     {autoTune ? "Active" : "Disabled"}
@@ -1608,53 +1704,53 @@ export default function BallBalancerResearch({
               {/* Physical Parameters Estimates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Authority a */}
-                <div className="bg-[#161719] p-3.5 rounded-xl border border-slate-800/80 flex flex-col gap-2">
+                <div className="bg-[#040407] p-3.5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-[10px] font-mono">
-                    <span className="text-slate-400 uppercase font-bold">Control Authority (a)</span>
-                    <span className="text-[#CFFF3E] font-bold">
+                    <span className="text-zinc-400 uppercase font-bold">Control Authority (a)</span>
+                    <span className="text-emerald-400 font-bold">
                       {balancerData?.data?.est_a !== undefined ? balancerData.data.est_a.toFixed(4) : "0.5000"}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-white/[0.04] h-1.5 rounded-full overflow-hidden">
                     <div 
-                      className="bg-[#CFFF3E] h-full rounded-full transition-all duration-300"
+                      className="bg-emerald-400 text-black h-full rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, Math.max(0, ((balancerData?.data?.est_a ?? 0.5) / 3.0) * 100))}%` }}
                     />
                   </div>
-                  <span className="text-[9px] text-slate-500 font-mono">Acceleration response per unit of plate tilt. Clamped [0.1, 3.0]</span>
+                  <span className="text-[9px] text-zinc-500 font-mono">Acceleration response per unit of plate tilt. Clamped [0.1, 3.0]</span>
                 </div>
 
                 {/* Damping b */}
-                <div className="bg-[#161719] p-3.5 rounded-xl border border-slate-800/80 flex flex-col gap-2">
+                <div className="bg-[#040407] p-3.5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-[10px] font-mono">
-                    <span className="text-slate-400 uppercase font-bold">Rolling Resistance (b)</span>
+                    <span className="text-zinc-400 uppercase font-bold">Rolling Resistance (b)</span>
                     <span className="text-[#B5ACF3] font-bold">
                       {balancerData?.data?.est_b !== undefined ? balancerData.data.est_b.toFixed(4) : "-0.1000"}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-white/[0.04] h-1.5 rounded-full overflow-hidden">
                     <div 
                       className="bg-[#B5ACF3] h-full rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, Math.max(0, (((balancerData?.data?.est_b ?? -0.1) + 1.0) / 1.2) * 100))}%` }}
                     />
                   </div>
-                  <span className="text-[9px] text-slate-500 font-mono">Frictional damping resisting ball velocity. Clamped [-1.0, 0.2]</span>
+                  <span className="text-[9px] text-zinc-500 font-mono">Frictional damping resisting ball velocity. Clamped [-1.0, 0.2]</span>
                 </div>
               </div>
 
               {/* Dynamically Tuned Gains Display */}
-              <div className="bg-[#161719] p-4 rounded-xl border border-slate-800/80 flex flex-col gap-2">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Model-Tuned Target Gains (Critical Damping)</span>
+              <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Model-Tuned Target Gains (Critical Damping)</span>
                 <div className="grid grid-cols-2 gap-4 text-xs font-mono mt-1">
-                  <div className="flex justify-between items-center border-r border-slate-800/60 pr-4">
-                    <span className="text-slate-500 font-bold">Kp (Proportional)</span>
-                    <span className={`font-bold text-sm ${autoTune ? "text-[#CFFF3E]" : "text-slate-400"}`}>
+                  <div className="flex justify-between items-center border-r border-white/[0.07]/60 pr-4">
+                    <span className="text-zinc-500 font-bold">Kp (Proportional)</span>
+                    <span className={`font-bold text-sm ${autoTune ? "text-emerald-400" : "text-zinc-400"}`}>
                       {autoTune ? kp.toFixed(3) : (balancerData?.data?.est_a ? ((3.2 * speed * 3.2 * speed) / balancerData.data.est_a).toFixed(3) : "1.300")}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pl-2">
-                    <span className="text-slate-500 font-bold">Kd (Derivative)</span>
-                    <span className={`font-bold text-sm ${autoTune ? "text-[#B5ACF3]" : "text-slate-400"}`}>
+                    <span className="text-zinc-500 font-bold">Kd (Derivative)</span>
+                    <span className={`font-bold text-sm ${autoTune ? "text-[#B5ACF3]" : "text-zinc-400"}`}>
                       {autoTune ? kd.toFixed(3) : (balancerData?.data?.est_a ? ((2.0 * 3.2 * speed + (balancerData.data.est_b ?? -0.1)) / balancerData.data.est_a).toFixed(3) : "0.500")}
                     </span>
                   </div>
@@ -1663,17 +1759,17 @@ export default function BallBalancerResearch({
 
               {/* Console Logs */}
               <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider font-mono">Real-Time Parameter Log</span>
-                <div className="bg-black/50 border border-slate-800/80 p-3 rounded-xl font-mono text-[10px] text-slate-400 overflow-y-auto max-h-[120px] flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono">Real-Time Parameter Log</span>
+                <div className="bg-black/50 border border-white/[0.07]/80 p-3 rounded-xl font-mono text-[10px] text-zinc-400 overflow-y-auto max-h-[120px] flex flex-col gap-1">
                   {learningLog.length === 0 ? (
                     <span className="text-slate-600 italic">Console idle: Waiting for telemetry updates...</span>
                   ) : (
                     learningLog.map((log, idx) => (
                       <div key={idx} className="flex justify-between items-center border-b border-slate-900/60 pb-1 last:border-b-0 last:pb-0">
                         <span className="text-slate-600">[{log.time}]</span>
-                        <span>a: <strong className="text-[#CFFF3E]">{log.a.toFixed(3)}</strong> | b: <strong className="text-[#B5ACF3]">{log.b.toFixed(3)}</strong></span>
+                        <span>a: <strong className="text-emerald-400">{log.a.toFixed(3)}</strong> | b: <strong className="text-[#B5ACF3]">{log.b.toFixed(3)}</strong></span>
                         <span>Kp: <strong className="text-white">{log.kp.toFixed(2)}</strong> | Kd: <strong className="text-white">{log.kd.toFixed(2)}</strong></span>
-                        <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md ${log.status === "AUTO" ? "bg-[#CFFF3E]/10 text-[#CFFF3E]" : "bg-slate-800 text-slate-500"}`}>
+                        <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md ${log.status === "AUTO" ? "bg-emerald-400 text-black/10 text-emerald-400" : "bg-white/[0.04] text-zinc-500"}`}>
                           {log.status}
                         </span>
                       </div>
@@ -1687,10 +1783,10 @@ export default function BallBalancerResearch({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* Active Model Exploration & Excitation Panel */}
-              <div className="bg-[#202123] border border-slate-800 p-5 rounded-xl flex flex-col gap-4">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+              <div className="bg-[#040407] border border-white/[0.07] p-5 rounded-xl flex flex-col gap-4">
+                <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
                   <div className="flex items-center gap-2">
-                    <div className={`h-2.5 w-2.5 rounded-full ${balancerData?.exploration_mode ? "bg-[#CFFF3E] animate-pulse" : "bg-slate-600"}`} />
+                    <div className={`h-2.5 w-2.5 rounded-full ${balancerData?.exploration_mode ? "bg-emerald-400 text-black animate-pulse" : "bg-slate-600"}`} />
                     <span className="text-xs uppercase font-bold text-white tracking-wider">Active Exploration Mode</span>
                   </div>
                   <button
@@ -1707,8 +1803,8 @@ export default function BallBalancerResearch({
                     }}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${
                       balancerData?.exploration_mode 
-                        ? "bg-[#CFFF3E] text-slate-900 shadow hover:scale-105" 
-                        : "bg-slate-800 text-slate-400 hover:text-white"
+                        ? "bg-emerald-400 text-black text-slate-900 shadow hover:scale-105" 
+                        : "bg-white/[0.04] text-zinc-400 hover:text-white"
                     }`}
                   >
                     {balancerData?.exploration_mode ? "ACTIVE" : "DISABLED"}
@@ -1716,31 +1812,31 @@ export default function BallBalancerResearch({
                 </div>
 
                 {/* Stability hold progress bar */}
-                <div className="bg-[#161719] p-4 rounded-xl border border-slate-800/80 flex flex-col gap-2 font-mono">
+                <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2 font-mono">
                   <div className="flex justify-between items-center text-[10px]">
-                    <span className="text-slate-500 uppercase font-bold">Stability Countdown</span>
-                    <span className="text-[#CFFF3E] font-bold">
+                    <span className="text-zinc-500 uppercase font-bold">Stability Countdown</span>
+                    <span className="text-emerald-400 font-bold">
                       {balancerData?.exploration_mode ? `${Math.round((balancerData?.exploration_progress ?? 0) * 100)}%` : "0%"}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1">
+                  <div className="w-full bg-white/[0.04] h-2 rounded-full overflow-hidden mt-1">
                     <div 
-                      className="bg-[#CFFF3E] h-full rounded-full transition-all duration-200"
+                      className="bg-emerald-400 text-black h-full rounded-full transition-all duration-200"
                       style={{ width: `${balancerData?.exploration_mode ? Math.min(100, (balancerData?.exploration_progress ?? 0) * 100) : 0}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Target coordinates readouts */}
-                <div className="bg-[#161719] p-4 rounded-xl border border-slate-800/80 flex flex-col gap-2 font-mono">
-                  <div className="flex justify-between text-xs pb-1 border-b border-slate-850/60 font-mono">
-                    <span className="text-slate-500">Active Exploration Target</span>
-                    <span className="text-[#CFFF3E] font-bold">
+                <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]/80 flex flex-col gap-2 font-mono">
+                  <div className="flex justify-between text-xs pb-1 border-b border-white/[0.06]/60 font-mono">
+                    <span className="text-zinc-500">Active Exploration Target</span>
+                    <span className="text-emerald-400 font-bold">
                       {balancerData?.exploration_mode ? `${(balancerData?.data?.target_y * 1000.0).toFixed(0)} mm` : "Center (0 mm)"}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs pt-1">
-                    <span className="text-slate-500 font-bold">Live Coordinates Proximity</span>
+                    <span className="text-zinc-500 font-bold">Live Coordinates Proximity</span>
                     <span className="text-white">
                       {hasBall ? `${(balancerData?.data?.ball_y * 1000.0).toFixed(1)} mm` : "N/A"}
                     </span>
@@ -1749,8 +1845,8 @@ export default function BallBalancerResearch({
               </div>
 
               {/* Polynomial Model Coefficients */}
-              <div className="bg-[#202123] border border-slate-800 p-5 rounded-xl flex flex-col gap-3 font-mono">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-2.5 mb-0.5">
+              <div className="bg-[#040407] border border-white/[0.07] p-5 rounded-xl flex flex-col gap-3 font-mono">
+                <div className="flex justify-between items-center border-b border-white/[0.07] pb-2.5 mb-0.5">
                   <span className="text-xs uppercase font-bold text-white tracking-wider">Cubic Polynomial Map</span>
                   <button
                     onClick={async () => {
@@ -1766,29 +1862,29 @@ export default function BallBalancerResearch({
                   </button>
                 </div>
                 
-                <div className="flex justify-between text-xs border-b border-slate-850/60 pb-1">
-                  <span className="text-slate-500">Offset (c0)</span>
-                  <span className="text-[#CFFF3E] font-bold">
+                <div className="flex justify-between text-xs border-b border-white/[0.06]/60 pb-1">
+                  <span className="text-zinc-500">Offset (c0)</span>
+                  <span className="text-emerald-400 font-bold">
                     {balancerData?.data?.loadcell_c0 !== undefined ? balancerData.data.loadcell_c0.toFixed(4) : "0.0000"}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-xs border-b border-slate-850/60 pb-1">
-                  <span className="text-slate-500">Linear (c1)</span>
-                  <span className="text-[#CFFF3E] font-bold">
+                <div className="flex justify-between text-xs border-b border-white/[0.06]/60 pb-1">
+                  <span className="text-zinc-500">Linear (c1)</span>
+                  <span className="text-emerald-400 font-bold">
                     {balancerData?.data?.loadcell_c1 !== undefined ? balancerData.data.loadcell_c1.toFixed(4) : "0.2200"}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-xs border-b border-slate-850/60 pb-1">
-                  <span className="text-slate-500">Quadratic (c2)</span>
+                <div className="flex justify-between text-xs border-b border-white/[0.06]/60 pb-1">
+                  <span className="text-zinc-500">Quadratic (c2)</span>
                   <span className="text-[#B5ACF3] font-bold">
                     {balancerData?.data?.loadcell_c2 !== undefined ? balancerData.data.loadcell_c2.toFixed(4) : "0.0000"}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-xs border-b border-slate-850/60 pb-1">
-                  <span className="text-slate-500">Cubic (c3)</span>
+                <div className="flex justify-between text-xs border-b border-white/[0.06]/60 pb-1">
+                  <span className="text-zinc-500">Cubic (c3)</span>
                   <span className="text-[#B5ACF3] font-bold">
                     {balancerData?.data?.loadcell_c3 !== undefined ? balancerData.data.loadcell_c3.toFixed(4) : "0.0000"}
                   </span>
@@ -1806,15 +1902,15 @@ export default function BallBalancerResearch({
 
         {/* Pose Sequence Editor Application */}
         {activeApp === "sequence" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in text-slate-300">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in text-zinc-300">
             
             {/* Sidebar: Saved sequences */}
-            <div className="bg-[#202123] p-4 rounded-xl border border-slate-800 flex flex-col gap-4 h-fit">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400">
+            <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07] flex flex-col gap-4 h-fit">
+              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-zinc-400">
                 <span>Preset Sequences</span>
                 <button
                   onClick={handleAddSequence}
-                  className="px-2.5 py-1 bg-[#CFFF3E] text-slate-900 font-extrabold rounded-lg hover:scale-105 active:scale-95 transition text-[9px]"
+                  className="px-2.5 py-1 bg-emerald-400 text-black text-slate-900 font-extrabold rounded-lg hover:scale-105 active:scale-95 transition text-[9px]"
                 >
                   + Create New
                 </button>
@@ -1829,8 +1925,8 @@ export default function BallBalancerResearch({
                       key={sidx}
                       className={`flex justify-between items-center p-3 rounded-xl border transition cursor-pointer ${
                         isSelected 
-                          ? "bg-[#CFFF3E]/10 border-[#CFFF3E] text-white font-extrabold" 
-                          : "bg-slate-900 border-slate-800/60 text-slate-400 hover:text-white"
+                          ? "bg-emerald-400 text-black/10 border-emerald-500 text-white font-extrabold" 
+                          : "bg-[#040407] border-white/[0.07]/60 text-zinc-400 hover:text-white"
                       }`}
                       onClick={() => {
                         setActiveSeqIndex(sidx);
@@ -1839,7 +1935,7 @@ export default function BallBalancerResearch({
                     >
                       <div className="flex flex-col gap-0.5 truncate">
                         <span className="text-xs truncate">{seq.name}</span>
-                        <span className="text-[9px] text-slate-500 font-mono">
+                        <span className="text-[9px] text-zinc-500 font-mono">
                           {seq.steps.length} Step(s) {isSeqPlaying && "(Playing)"}
                         </span>
                       </div>
@@ -1849,7 +1945,7 @@ export default function BallBalancerResearch({
                           e.stopPropagation();
                           handleDeleteSequence(sidx);
                         }}
-                        className="p-1 rounded-lg text-slate-500 hover:text-red-400 transition ml-2"
+                        className="p-1 rounded-lg text-zinc-500 hover:text-red-400 transition ml-2"
                       >
                         ✕
                       </button>
@@ -1866,10 +1962,10 @@ export default function BallBalancerResearch({
                 <div className="flex flex-col gap-4">
                   
                   {/* Active sequence header configurations */}
-                  <div className="bg-[#202123] p-4 rounded-xl border border-slate-800 flex flex-col gap-4">
+                  <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07] flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Sequence Name</label>
+                        <label className="text-[9px] uppercase font-bold tracking-wider text-zinc-400">Sequence Name</label>
                         <input
                           type="text"
                           value={activeSeq.name}
@@ -1878,27 +1974,27 @@ export default function BallBalancerResearch({
                             next[activeSeqIndex].name = e.target.value;
                             setSequences(next);
                           }}
-                          className="bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-[#CFFF3E]"
+                          className="bg-[#040407] border border-white/[0.07] px-3 py-2 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-emerald-500"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Play Loops</label>
+                          <label className="text-[9px] uppercase font-bold tracking-wider text-zinc-400">Play Loops</label>
                           <input
                             type="number"
                             min="1"
                             max="50"
                             value={playbackLoop}
                             onChange={(e) => setPlaybackLoop(parseInt(e.target.value) || 1)}
-                            className="bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs font-bold text-center text-white focus:outline-none"
+                            className="bg-[#040407] border border-white/[0.07] px-3 py-2 rounded-xl text-xs font-bold text-center text-white focus:outline-none"
                           />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Speed Ratio</label>
+                          <label className="text-[9px] uppercase font-bold tracking-wider text-zinc-400">Speed Ratio</label>
                           <select
                             value={playbackSpeed}
                             onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-                            className="bg-slate-900 border border-slate-800 px-2 py-2 rounded-xl text-xs font-bold text-white focus:outline-none cursor-pointer"
+                            className="bg-[#040407] border border-white/[0.07] px-2 py-2 rounded-xl text-xs font-bold text-white focus:outline-none cursor-pointer"
                           >
                             <option value={0.5}>0.5x</option>
                             <option value={1.0}>1.0x (Normal)</option>
@@ -1909,11 +2005,11 @@ export default function BallBalancerResearch({
                       </div>
                     </div>
 
-                    <div className="flex gap-2 border-t border-slate-800/60 pt-3">
+                    <div className="flex gap-2 border-t border-white/[0.07]/60 pt-3">
                       <button
                         onClick={() => handlePlaySequence(activeSeq.name)}
                         disabled={!connected || seqStatus.is_playing}
-                        className="flex-1 bg-[#CFFF3E] text-slate-900 py-2 rounded-xl font-black uppercase tracking-wider text-[10px] transition hover:scale-[1.02] disabled:opacity-40 disabled:scale-100"
+                        className="flex-1 bg-emerald-400 text-black text-slate-900 py-2 rounded-xl font-black uppercase tracking-wider text-[10px] transition hover:scale-[1.02] disabled:opacity-40 disabled:scale-100"
                       >
                         Play Sequence
                       </button>
@@ -1926,7 +2022,7 @@ export default function BallBalancerResearch({
                       </button>
                       <button
                         onClick={() => handleSaveSequences()}
-                        className="flex-1 bg-slate-800 text-white border border-slate-700 py-2 rounded-xl font-bold uppercase tracking-wider text-[10px] transition hover:bg-slate-700"
+                        className="flex-1 bg-white/[0.04] text-white border border-white/[0.08] py-2 rounded-xl font-bold uppercase tracking-wider text-[10px] transition hover:bg-slate-700"
                       >
                         Save Configuration
                       </button>
@@ -1935,11 +2031,11 @@ export default function BallBalancerResearch({
 
                   {/* Step Editor timeline */}
                   <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-zinc-400">
                       <span>Timeline Steps</span>
                       <button
                         onClick={handleAddStep}
-                        className="px-3 py-1 bg-slate-800 text-white font-bold rounded-lg border border-slate-700 text-[9px]"
+                        className="px-3 py-1 bg-white/[0.04] text-white font-bold rounded-lg border border-white/[0.08] text-[9px]"
                       >
                         + Add Pose Step
                       </button>
@@ -1954,12 +2050,12 @@ export default function BallBalancerResearch({
                             key={idx}
                             className={`p-4 rounded-xl border flex flex-col gap-3 transition cursor-pointer ${
                               isSelectedStep
-                                ? "bg-[#202123] border-[#B5ACF3]"
-                                : "bg-[#161719] border-slate-800/80 hover:border-slate-850"
+                                ? "bg-[#040407] border-[#B5ACF3]"
+                                : "bg-[#040407] border-white/[0.07]/80 hover:border-white/[0.06]"
                             }`}
                             onClick={() => setSelectedStepIndex(idx)}
                           >
-                            <div className="flex justify-between items-center pb-2 border-b border-slate-800/30">
+                            <div className="flex justify-between items-center pb-2 border-b border-white/[0.07]/30">
                               <div className="flex items-center gap-3">
                                 <span className="text-xs font-black text-white">Pose Frame {idx + 1}</span>
                                 <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -1968,9 +2064,9 @@ export default function BallBalancerResearch({
                                     type="number"
                                     value={step.delay}
                                     onChange={(e) => handleUpdateStepDelay(idx, e.target.value)}
-                                    className="w-12 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-center text-white font-mono text-[10px]"
+                                    className="w-12 bg-[#040407] border border-white/[0.07] rounded px-1.5 py-0.5 text-center text-white font-mono text-[10px]"
                                   />
-                                  <span className="text-[9px] text-slate-500">({step.delay * 50}ms)</span>
+                                  <span className="text-[9px] text-zinc-500">({step.delay * 50}ms)</span>
                                 </div>
                               </div>
 
@@ -1985,7 +2081,7 @@ export default function BallBalancerResearch({
                                 <button
                                   onClick={() => handleCaptureCurrentPose(idx)}
                                   disabled={!connected}
-                                  className="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[9px] font-black uppercase transition hover:bg-slate-700 disabled:opacity-40"
+                                  className="px-2.5 py-1 bg-white/[0.04] text-zinc-300 border border-white/[0.08] rounded-lg text-[9px] font-black uppercase transition hover:bg-slate-700 disabled:opacity-40"
                                   title="Capture current physical motor tick offsets"
                                 >
                                   Capture Pose
@@ -1993,14 +2089,14 @@ export default function BallBalancerResearch({
                                 <button
                                   onClick={() => handleMoveStep(idx, -1)}
                                   disabled={idx === 0}
-                                  className="p-1 bg-slate-800 rounded hover:bg-slate-700 text-slate-400 disabled:opacity-30"
+                                  className="p-1 bg-white/[0.04] rounded hover:bg-slate-700 text-zinc-400 disabled:opacity-30"
                                 >
                                   ▲
                                 </button>
                                 <button
                                   onClick={() => handleMoveStep(idx, 1)}
                                   disabled={idx === activeSeq.steps.length - 1}
-                                  className="p-1 bg-slate-800 rounded hover:bg-slate-700 text-slate-400 disabled:opacity-30"
+                                  className="p-1 bg-white/[0.04] rounded hover:bg-slate-700 text-zinc-400 disabled:opacity-30"
                                 >
                                   ▼
                                 </button>
@@ -2014,13 +2110,13 @@ export default function BallBalancerResearch({
                             </div>
 
                             {/* Summary of modifications */}
-                            <div className="text-[10px] text-slate-500 font-mono flex flex-wrap gap-1.5">
+                            <div className="text-[10px] text-zinc-500 font-mono flex flex-wrap gap-1.5">
                               {modCount === 0 ? (
                                 <span>No joints modified (all defaults)</span>
                               ) : (
                                 Object.entries(step.modifications).map(([joint, val]) => (
-                                  <span key={joint} className="bg-slate-900 border border-slate-800/80 px-2 py-0.5 rounded text-slate-400">
-                                    {joint}: <span className="text-[#CFFF3E] font-bold">{val > 0 ? `+${val}` : val}</span>
+                                  <span key={joint} className="bg-[#040407] border border-white/[0.07]/80 px-2 py-0.5 rounded text-zinc-400">
+                                    {joint}: <span className="text-emerald-400 font-bold">{val > 0 ? `+${val}` : val}</span>
                                   </span>
                                 ))
                               )}
@@ -2028,7 +2124,7 @@ export default function BallBalancerResearch({
 
                             {/* Slider panel for selected step */}
                               {isSelectedStep && (
-                              <div className="mt-2 border-t border-slate-800/40 pt-3 flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
+                              <div className="mt-2 border-t border-white/[0.07]/40 pt-3 flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
                                 {Object.keys(limits).length > 0 ? (
                                   (() => {
                                     const categories = {
@@ -2071,14 +2167,14 @@ export default function BallBalancerResearch({
                                       const isExpanded = expandedSections[catKey];
                                       
                                       return (
-                                        <div key={catKey} className="bg-slate-950/40 rounded-xl border border-slate-800/60 p-3 space-y-2">
+                                        <div key={catKey} className="bg-slate-950/40 rounded-xl border border-white/[0.07]/60 p-3 space-y-2">
                                           <button
                                             onClick={() => setExpandedSections(prev => ({ ...prev, [catKey]: !prev[catKey] }))}
-                                            className="w-full flex items-center justify-between font-bold text-[10px] uppercase tracking-wider text-slate-400 hover:text-white transition focus:outline-none"
+                                            className="w-full flex items-center justify-between font-bold text-[10px] uppercase tracking-wider text-zinc-400 hover:text-white transition focus:outline-none"
                                           >
                                             <div className="flex items-center gap-1.5">
                                               <span className="font-extrabold text-slate-200">{catData.title}</span>
-                                              <span className="bg-slate-800 text-slate-400 text-[8px] px-1.5 py-0.5 rounded font-mono font-bold">{catData.joints.length}</span>
+                                              <span className="bg-white/[0.04] text-zinc-400 text-[8px] px-1.5 py-0.5 rounded font-mono font-bold">{catData.joints.length}</span>
                                             </div>
                                             <span className="text-[8px] font-black font-mono transition-transform duration-200" style={{ display: 'inline-block', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
                                               ▶
@@ -2095,9 +2191,9 @@ export default function BallBalancerResearch({
                                                 const tempKey = `${idx}_${info.name}`;
                                                 const displayVal = seqInputValues[tempKey] !== undefined ? seqInputValues[tempKey] : val;
                                                 return (
-                                                  <div key={mid} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800/80 flex flex-col gap-1">
+                                                  <div key={mid} className="bg-[#040407] p-2.5 rounded-lg border border-white/[0.07]/80 flex flex-col gap-1">
                                                     <div className="flex justify-between items-center text-[10px]">
-                                                      <span className="font-bold text-slate-400">{info.name} <span className="text-[8px] text-slate-500 font-normal">(ID {mid})</span></span>
+                                                      <span className="font-bold text-zinc-400">{info.name} <span className="text-[8px] text-zinc-500 font-normal">(ID {mid})</span></span>
                                                       <input
                                                         type="text"
                                                         value={displayVal}
@@ -2125,7 +2221,7 @@ export default function BallBalancerResearch({
                                                             return next;
                                                           });
                                                         }}
-                                                        className="w-14 text-center text-[10px] font-mono font-bold text-[#CFFF3E] bg-slate-950 border border-slate-850 rounded py-0.5 focus:outline-none focus:border-[#CFFF3E]"
+                                                        className="w-14 text-center text-[10px] font-mono font-bold text-emerald-400 bg-slate-950 border border-white/[0.06] rounded py-0.5 focus:outline-none focus:border-emerald-500"
                                                       />
                                                     </div>
                                                     <input
@@ -2145,7 +2241,7 @@ export default function BallBalancerResearch({
                                                         };
                                                         handlePreviewStep(updatedStep);
                                                       }}
-                                                      className="w-full accent-[#CFFF3E]"
+                                                      className="w-full accent-emerald-400"
                                                     />
                                                   </div>
                                                 );
@@ -2157,7 +2253,7 @@ export default function BallBalancerResearch({
                                     });
                                   })()
                                 ) : (
-                                  <div className="text-slate-500 italic text-[10px] col-span-2 text-center py-4">
+                                  <div className="text-zinc-500 italic text-[10px] col-span-2 text-center py-4">
                                     No active joint mapping. Please connect robot/simulator first.
                                   </div>
                                 )}
@@ -2173,7 +2269,7 @@ export default function BallBalancerResearch({
 
                 </div>
               ) : (
-                <div className="text-slate-500 text-center py-20 italic bg-[#202123] rounded-xl border border-slate-800/80">
+                <div className="text-zinc-500 text-center py-20 italic bg-[#040407] rounded-xl border border-white/[0.07]/80">
                   Select a sequence to edit, or click "Create New".
                 </div>
               )}
@@ -2185,21 +2281,21 @@ export default function BallBalancerResearch({
 
         {/* Arm Calibration Application */}
         {activeApp === "calibration" && (
-          <div className="flex flex-col gap-6 animate-fade-in text-slate-300">
+          <div className="flex flex-col gap-6 animate-fade-in text-zinc-300">
             {/* Action Header Card */}
-            <div className="bg-[#202123] p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h3 className="text-white font-extrabold text-sm tracking-wider uppercase flex items-center gap-2">
-                  <Compass className="h-4 w-4 text-[#CFFF3E]" />
+                  <Compass className="h-4 w-4 text-emerald-400" />
                   <span>Physical Arm Calibration Wizard</span>
                 </h3>
-                <p className="text-[10px] text-slate-500 max-w-xl mt-1">
+                <p className="text-[10px] text-zinc-500 max-w-xl mt-1">
                   1. Power ON torques. 2. Manually position the arm joints to their exact physical neutral/balancing poses. 3. Click **Capture Arm Calibration** to save present encoder ticks. 4. Click **Save Offsets** to persist calibration.
                 </p>
               </div>
               <button
                 onClick={handleSaveCalibration}
-                className="w-full md:w-auto bg-[#CFFF3E] text-slate-900 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider hover:scale-[1.02] active:scale-95 transition"
+                className="w-full md:w-auto bg-emerald-400 text-black text-slate-900 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider hover:scale-[1.02] active:scale-95 transition"
               >
                 Save Offsets to File
               </button>
@@ -2208,8 +2304,8 @@ export default function BallBalancerResearch({
             {/* Arm Panels Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Arm Calibration Card */}
-              <div className="bg-[#202123] p-4 rounded-xl border border-slate-800/80 flex flex-col gap-4">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+              <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]/80 flex flex-col gap-4">
+                <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
                   <span className="text-white font-bold text-xs tracking-wide uppercase">🦾 Left Arm Calibration</span>
                   <div className="flex gap-1.5">
                     <button
@@ -2229,7 +2325,7 @@ export default function BallBalancerResearch({
                     <button
                       onClick={() => handleCaptureCalibration("left")}
                       disabled={!connected}
-                      className="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[9px] font-black uppercase hover:bg-slate-700 transition disabled:opacity-40"
+                      className="px-2.5 py-1 bg-white/[0.04] text-zinc-300 border border-white/[0.08] rounded-lg text-[9px] font-black uppercase hover:bg-slate-700 transition disabled:opacity-40"
                     >
                       Capture
                     </button>
@@ -2239,7 +2335,7 @@ export default function BallBalancerResearch({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-[11px]">
                     <thead>
-                      <tr className="border-b border-slate-850 text-slate-500">
+                      <tr className="border-b border-white/[0.06] text-zinc-500">
                         <th className="py-2 font-semibold">Joint</th>
                         <th className="py-2 font-semibold text-center">ID</th>
                         <th className="py-2 font-semibold text-center">Live Position</th>
@@ -2247,7 +2343,7 @@ export default function BallBalancerResearch({
                         <th className="py-2 font-semibold text-center">Torque</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-850/40 text-slate-350">
+                    <tbody className="divide-y divide-slate-850/40 text-zinc-300">
                       {[
                         { id: 21, defaultName: "L1P" },
                         { id: 12, defaultName: "L2R" },
@@ -2267,9 +2363,9 @@ export default function BallBalancerResearch({
                         const displayVal = calibInputValues[tempKey] !== undefined ? calibInputValues[tempKey] : calibVal;
 
                         return (
-                          <tr key={mid} className="hover:bg-slate-900/20">
+                          <tr key={mid} className="hover:bg-[#040407]/20">
                             <td className="py-2 text-slate-200 font-bold">{jointName}</td>
-                            <td className="py-2 text-center text-slate-500 font-mono">{mid}</td>
+                            <td className="py-2 text-center text-zinc-500 font-mono">{mid}</td>
                             <td className={`py-2 text-center font-mono font-bold ${livePos === "--" ? "text-slate-600" : "text-white"}`}>
                               {livePos}
                             </td>
@@ -2298,7 +2394,7 @@ export default function BallBalancerResearch({
                                     return next;
                                   });
                                 }}
-                                className="w-20 text-center font-mono font-bold text-[#CFFF3E] bg-slate-950 border border-slate-850 rounded py-0.5 focus:outline-none focus:border-[#CFFF3E]"
+                                className="w-20 text-center font-mono font-bold text-emerald-400 bg-slate-950 border border-white/[0.06] rounded py-0.5 focus:outline-none focus:border-emerald-500"
                               />
                             </td>
                             <td className="py-2 text-center">
@@ -2308,7 +2404,7 @@ export default function BallBalancerResearch({
                                 className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded transition ${
                                   isTorqueOn
                                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                    : "bg-slate-900 text-slate-500 border border-slate-800"
+                                    : "bg-[#040407] text-zinc-500 border border-white/[0.07]"
                                 }`}
                               >
                                 {isTorqueOn ? "ON" : "OFF"}
@@ -2323,8 +2419,8 @@ export default function BallBalancerResearch({
               </div>
 
               {/* Right Arm Calibration Card */}
-              <div className="bg-[#202123] p-4 rounded-xl border border-slate-800/80 flex flex-col gap-4">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+              <div className="bg-[#040407] p-4 rounded-xl border border-white/[0.07]/80 flex flex-col gap-4">
+                <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
                   <span className="text-white font-bold text-xs tracking-wide uppercase">🦾 Right Arm Calibration</span>
                   <div className="flex gap-1.5">
                     <button
@@ -2344,7 +2440,7 @@ export default function BallBalancerResearch({
                     <button
                       onClick={() => handleCaptureCalibration("right")}
                       disabled={!connected}
-                      className="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[9px] font-black uppercase hover:bg-slate-700 transition disabled:opacity-40"
+                      className="px-2.5 py-1 bg-white/[0.04] text-zinc-300 border border-white/[0.08] rounded-lg text-[9px] font-black uppercase hover:bg-slate-700 transition disabled:opacity-40"
                     >
                       Capture
                     </button>
@@ -2354,7 +2450,7 @@ export default function BallBalancerResearch({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-[11px]">
                     <thead>
-                      <tr className="border-b border-slate-850 text-slate-500">
+                      <tr className="border-b border-white/[0.06] text-zinc-500">
                         <th className="py-2 font-semibold">Joint</th>
                         <th className="py-2 font-semibold text-center">ID</th>
                         <th className="py-2 font-semibold text-center">Live Position</th>
@@ -2362,7 +2458,7 @@ export default function BallBalancerResearch({
                         <th className="py-2 font-semibold text-center">Torque</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-850/40 text-slate-350">
+                    <tbody className="divide-y divide-slate-850/40 text-zinc-300">
                       {[
                         { id: 11, defaultName: "R1P" },
                         { id: 22, defaultName: "R2R" },
@@ -2382,9 +2478,9 @@ export default function BallBalancerResearch({
                         const displayVal = calibInputValues[tempKey] !== undefined ? calibInputValues[tempKey] : calibVal;
 
                         return (
-                          <tr key={mid} className="hover:bg-slate-900/20">
+                          <tr key={mid} className="hover:bg-[#040407]/20">
                             <td className="py-2 text-slate-200 font-bold">{jointName}</td>
-                            <td className="py-2 text-center text-slate-500 font-mono">{mid}</td>
+                            <td className="py-2 text-center text-zinc-500 font-mono">{mid}</td>
                             <td className={`py-2 text-center font-mono font-bold ${livePos === "--" ? "text-slate-600" : "text-white"}`}>
                               {livePos}
                             </td>
@@ -2413,7 +2509,7 @@ export default function BallBalancerResearch({
                                     return next;
                                   });
                                 }}
-                                className="w-20 text-center font-mono font-bold text-[#CFFF3E] bg-slate-950 border border-slate-850 rounded py-0.5 focus:outline-none focus:border-[#CFFF3E]"
+                                className="w-20 text-center font-mono font-bold text-emerald-400 bg-slate-950 border border-white/[0.06] rounded py-0.5 focus:outline-none focus:border-emerald-500"
                               />
                             </td>
                             <td className="py-2 text-center">
@@ -2423,7 +2519,7 @@ export default function BallBalancerResearch({
                                 className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded transition ${
                                   isTorqueOn
                                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                    : "bg-slate-900 text-slate-500 border border-slate-800"
+                                    : "bg-[#040407] text-zinc-500 border border-white/[0.07]"
                                 }`}
                               >
                                 {isTorqueOn ? "ON" : "OFF"}
@@ -2442,15 +2538,15 @@ export default function BallBalancerResearch({
 
         {/* Load Cell Settings Application */}
         {activeApp === "loadcell" && (
-          <div className="flex flex-col gap-6 animate-fade-in text-slate-300">
+          <div className="flex flex-col gap-6 animate-fade-in text-zinc-300">
             {/* Header Card */}
-            <div className="bg-[#202123] p-5 rounded-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="bg-[#040407] p-5 rounded-xl border border-white/[0.07] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h3 className="text-white font-extrabold text-sm tracking-wider uppercase flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-[#CFFF3E]" />
+                  <Settings className="h-4 w-4 text-emerald-400" />
                   <span>Dual Load Cell Configuration</span>
                 </h3>
-                <p className="text-[10px] text-slate-500 max-w-xl mt-1">
+                <p className="text-[10px] text-zinc-500 max-w-xl mt-1">
                   Configure serial connection, tare offsets, perform individual load cell weight calibrations, and monitor the dynamic coordinate system learning loop.
                 </p>
               </div>
@@ -2459,7 +2555,7 @@ export default function BallBalancerResearch({
                   <select
                     value={selectedPort}
                     onChange={(e) => setSelectedPort(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 text-white rounded-xl pl-3 pr-8 py-2 text-xs font-mono focus:outline-none focus:border-[#CFFF3E] w-32 appearance-none cursor-pointer"
+                    className="bg-slate-950 border border-white/[0.07] text-white rounded-xl pl-3 pr-8 py-2 text-xs font-mono focus:outline-none focus:border-emerald-500 w-32 appearance-none cursor-pointer"
                   >
                     {availablePorts.length === 0 ? (
                       <option value="">No ports found</option>
@@ -2469,7 +2565,7 @@ export default function BallBalancerResearch({
                       ))
                     )}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-500">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                       <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                     </svg>
@@ -2479,7 +2575,7 @@ export default function BallBalancerResearch({
                 <button
                   onClick={fetchPorts}
                   title="Rescan COM Ports"
-                  className="p-2.5 bg-slate-800 text-slate-400 hover:text-white rounded-xl border border-slate-700 transition"
+                  className="p-2.5 bg-white/[0.04] text-zinc-400 hover:text-white rounded-xl border border-white/[0.08] transition"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                 </button>
@@ -2514,7 +2610,7 @@ export default function BallBalancerResearch({
                       }
                     }}
                     disabled={!selectedPort}
-                    className="bg-[#CFFF3E] hover:scale-[1.02] text-slate-900 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition disabled:opacity-40"
+                    className="bg-emerald-400 text-black hover:scale-[1.02] text-slate-900 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition disabled:opacity-40"
                   >
                     Connect
                   </button>
@@ -2526,8 +2622,8 @@ export default function BallBalancerResearch({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* Box 1: Sensor Readings & Live Calibration */}
-              <div className="bg-[#202123] p-5 rounded-xl border border-slate-800/80 flex flex-col gap-4">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+              <div className="bg-[#040407] p-5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-4">
+                <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
                   <span className="text-white font-bold text-xs uppercase tracking-wide">⚖️ Sensor Readings & Tare</span>
                   <button
                     onClick={async () => {
@@ -2537,7 +2633,7 @@ export default function BallBalancerResearch({
                         console.error(e);
                       }
                     }}
-                    className="px-4 py-2 bg-[#CFFF3E] text-slate-900 rounded-xl text-xs font-black uppercase hover:scale-[1.02] active:scale-95 transition"
+                    className="px-4 py-2 bg-emerald-400 text-black text-slate-900 rounded-xl text-xs font-black uppercase hover:scale-[1.02] active:scale-95 transition"
                   >
                     Tare Scale (Zero Out)
                   </button>
@@ -2546,51 +2642,51 @@ export default function BallBalancerResearch({
                 {/* Left/Right Live Stats */}
                 <div className="grid grid-cols-2 gap-4">
                   {/* Left Load Cell */}
-                  <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-850 flex flex-col gap-2 font-mono">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold">Left Load Cell</span>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Raw ADC</span>
+                  <div className="bg-[#040407]/60 p-4 rounded-xl border border-white/[0.06] flex flex-col gap-2 font-mono">
+                    <span className="text-[10px] text-zinc-500 uppercase font-bold">Left Load Cell</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Raw ADC</span>
                       <span className="text-white font-bold">{(balancerData?.loadcell?.raw_L ?? 0).toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Tare Offset</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Tare Offset</span>
                       <span className="text-white">{(balancerData?.loadcell?.tare_L ?? 0).toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Scale Factor</span>
-                      <span className="text-[#CFFF3E]">{(balancerData?.loadcell?.cal_factor_L ?? 1).toFixed(2)}</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Scale Factor</span>
+                      <span className="text-emerald-400">{(balancerData?.loadcell?.cal_factor_L ?? 1).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm pt-2">
-                      <span className="text-slate-400 font-bold">Weight</span>
-                      <span className="text-[#CFFF3E] font-black">{(balancerData?.loadcell?.weight_L ?? 0).toFixed(2)} g</span>
+                      <span className="text-zinc-400 font-bold">Weight</span>
+                      <span className="text-emerald-400 font-black">{(balancerData?.loadcell?.weight_L ?? 0).toFixed(2)} g</span>
                     </div>
                   </div>
 
                   {/* Right Load Cell */}
-                  <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-850 flex flex-col gap-2 font-mono">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold">Right Load Cell</span>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Raw ADC</span>
+                  <div className="bg-[#040407]/60 p-4 rounded-xl border border-white/[0.06] flex flex-col gap-2 font-mono">
+                    <span className="text-[10px] text-zinc-500 uppercase font-bold">Right Load Cell</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Raw ADC</span>
                       <span className="text-white font-bold">{(balancerData?.loadcell?.raw_R ?? 0).toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Tare Offset</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Tare Offset</span>
                       <span className="text-white">{(balancerData?.loadcell?.tare_R ?? 0).toFixed(0)}</span>
                     </div>
-                    <div className="flex justify-between text-xs pt-1 border-b border-slate-850/60 pb-1">
-                      <span className="text-slate-500">Scale Factor</span>
+                    <div className="flex justify-between text-xs pt-1 border-b border-white/[0.06]/60 pb-1">
+                      <span className="text-zinc-500">Scale Factor</span>
                       <span className="text-[#B5ACF3]">{(balancerData?.loadcell?.cal_factor_R ?? 1).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm pt-2">
-                      <span className="text-slate-400 font-bold">Weight</span>
+                      <span className="text-zinc-400 font-bold">Weight</span>
                       <span className="text-[#B5ACF3] font-black">{(balancerData?.loadcell?.weight_R ?? 0).toFixed(2)} g</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Scale Weight Calibration Forms */}
-                <div className="flex flex-col gap-3.5 border-t border-slate-850 pt-4 mt-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Weight Calibration (Known Mass)</span>
+                <div className="flex flex-col gap-3.5 border-t border-white/[0.06] pt-4 mt-1">
+                  <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Weight Calibration (Known Mass)</span>
                   
                   {/* Calibrate Left */}
                   <div className="flex justify-between items-center gap-4">
@@ -2600,9 +2696,9 @@ export default function BallBalancerResearch({
                         type="number"
                         value={calibWeightL}
                         onChange={(e) => setCalibWeightL(parseFloat(e.target.value) || 0)}
-                        className="bg-slate-950 border border-slate-800 text-white rounded-lg px-2.5 py-1 text-xs font-mono focus:outline-none focus:border-[#CFFF3E] w-20"
+                        className="bg-slate-950 border border-white/[0.07] text-white rounded-lg px-2.5 py-1 text-xs font-mono focus:outline-none focus:border-emerald-500 w-20"
                       />
-                      <span className="text-xs text-slate-500">g</span>
+                      <span className="text-xs text-zinc-500">g</span>
                     </div>
                     <button
                       onClick={async () => {
@@ -2616,7 +2712,7 @@ export default function BallBalancerResearch({
                           console.error(e);
                         }
                       }}
-                      className="px-3 py-1.5 bg-slate-800 text-slate-350 border border-slate-700 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition"
+                      className="px-3 py-1.5 bg-white/[0.04] text-zinc-300 border border-white/[0.08] hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition"
                     >
                       Calibrate Left
                     </button>
@@ -2630,9 +2726,9 @@ export default function BallBalancerResearch({
                         type="number"
                         value={calibWeightR}
                         onChange={(e) => setCalibWeightR(parseFloat(e.target.value) || 0)}
-                        className="bg-slate-955 border border-slate-800 text-white rounded-lg px-2.5 py-1 text-xs font-mono focus:outline-none focus:border-[#CFFF3E] w-20"
+                        className="bg-slate-955 border border-white/[0.07] text-white rounded-lg px-2.5 py-1 text-xs font-mono focus:outline-none focus:border-emerald-500 w-20"
                       />
-                      <span className="text-xs text-slate-500">g</span>
+                      <span className="text-xs text-zinc-500">g</span>
                     </div>
                     <button
                       onClick={async () => {
@@ -2646,7 +2742,7 @@ export default function BallBalancerResearch({
                           console.error(e);
                         }
                       }}
-                      className="px-3 py-1.5 bg-slate-800 text-slate-350 border border-slate-700 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition"
+                      className="px-3 py-1.5 bg-white/[0.04] text-zinc-300 border border-white/[0.08] hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition"
                     >
                       Calibrate Right
                     </button>
@@ -2655,15 +2751,15 @@ export default function BallBalancerResearch({
               </div>
 
               {/* Box 2: Deployment Config, Convergence & Learning Status */}
-              <div className="bg-[#202123] p-5 rounded-xl border border-slate-800/80 flex flex-col gap-4">
+              <div className="bg-[#040407] p-5 rounded-xl border border-white/[0.07]/80 flex flex-col gap-4">
                 
                 {/* 1. Deployment Configuration */}
-                <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-850 flex flex-col gap-3 font-mono">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Deployment Configuration</span>
+                <div className="bg-[#040407]/60 p-4 rounded-xl border border-white/[0.06] flex flex-col gap-3 font-mono">
+                  <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Deployment Configuration</span>
                   
                   {/* Select Mode */}
                   <div className="flex flex-col gap-1.5 mt-1">
-                    <span className="text-slate-500 text-[10px]">Active Sensor Quantity:</span>
+                    <span className="text-zinc-500 text-[10px]">Active Sensor Quantity:</span>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => {
@@ -2672,8 +2768,8 @@ export default function BallBalancerResearch({
                         }}
                         className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                           loadcellMode === 1
-                            ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                            : "bg-slate-800 text-slate-400 hover:text-white"
+                            ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                            : "bg-white/[0.04] text-zinc-400 hover:text-white"
                         }`}
                       >
                         Single Load Cell (1)
@@ -2685,8 +2781,8 @@ export default function BallBalancerResearch({
                         }}
                         className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                           loadcellMode !== 1
-                            ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                            : "bg-slate-800 text-slate-400 hover:text-white"
+                            ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                            : "bg-white/[0.04] text-zinc-400 hover:text-white"
                         }`}
                       >
                         Dual Load Cells (2)
@@ -2696,8 +2792,8 @@ export default function BallBalancerResearch({
 
                   {/* Select Arm (If Single Mode) */}
                   {loadcellMode === 1 && (
-                    <div className="flex flex-col gap-1.5 mt-1.5 animate-fade-in border-t border-slate-850 pt-2">
-                      <span className="text-slate-500 text-[10px]">Active Arm Placement:</span>
+                    <div className="flex flex-col gap-1.5 mt-1.5 animate-fade-in border-t border-white/[0.06] pt-2">
+                      <span className="text-zinc-500 text-[10px]">Active Arm Placement:</span>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => {
@@ -2708,7 +2804,7 @@ export default function BallBalancerResearch({
                           className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                             loadcellArm === "left"
                               ? "bg-[#B5ACF3] text-slate-900 font-extrabold"
-                              : "bg-slate-800 text-slate-400 hover:text-white"
+                              : "bg-white/[0.04] text-zinc-400 hover:text-white"
                           }`}
                         >
                           Left Arm placement
@@ -2722,7 +2818,7 @@ export default function BallBalancerResearch({
                           className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                             loadcellArm === "right"
                               ? "bg-[#B5ACF3] text-slate-900 font-extrabold"
-                              : "bg-slate-800 text-slate-400 hover:text-white"
+                              : "bg-white/[0.04] text-zinc-400 hover:text-white"
                           }`}
                         >
                           Right Arm placement
@@ -2732,7 +2828,7 @@ export default function BallBalancerResearch({
                       {/* Reference Ball weight input */}
                       <div className="flex flex-col gap-1 mt-2">
                         <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-slate-500">Reference Ball Weight (g):</span>
+                          <span className="text-zinc-500">Reference Ball Weight (g):</span>
                           <span className="text-white font-mono">{ballWeightRef} g</span>
                         </div>
                         <div className="flex gap-2 items-center">
@@ -2771,7 +2867,7 @@ export default function BallBalancerResearch({
                                 ball_type: ballType
                               });
                             }}
-                            className="w-full accent-[#B5ACF3] h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                            className="w-full accent-[#B5ACF3] h-1 bg-white/[0.04] rounded-lg appearance-none cursor-pointer"
                           />
                         </div>
                       </div>
@@ -2779,8 +2875,8 @@ export default function BallBalancerResearch({
                   )}
 
                   {/* Select Ball Target Type */}
-                  <div className="flex flex-col gap-1.5 mt-2.5 border-t border-slate-850 pt-2 font-mono">
-                    <span className="text-slate-500 text-[10px]">Tracked Ball Target Type:</span>
+                  <div className="flex flex-col gap-1.5 mt-2.5 border-t border-white/[0.06] pt-2 font-mono">
+                    <span className="text-zinc-500 text-[10px]">Tracked Ball Target Type:</span>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => {
@@ -2799,8 +2895,8 @@ export default function BallBalancerResearch({
                         }}
                         className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                           ballType !== "metal_chrome"
-                            ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                            : "bg-slate-800 text-slate-400 hover:text-white"
+                            ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                            : "bg-white/[0.04] text-zinc-400 hover:text-white"
                         }`}
                       >
                         🟢 Ping Pong (100g)
@@ -2822,8 +2918,8 @@ export default function BallBalancerResearch({
                         }}
                         className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition ${
                           ballType === "metal_chrome"
-                            ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                            : "bg-slate-800 text-slate-400 hover:text-white"
+                            ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                            : "bg-white/[0.04] text-zinc-400 hover:text-white"
                         }`}
                       >
                         🔘 Chrome Metal (225g)
@@ -2833,8 +2929,8 @@ export default function BallBalancerResearch({
                 </div>
 
                 {/* 2. Learning Progress & Status Indicator */}
-                <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-850 flex flex-col gap-3 font-mono">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Calibration Accuracy status</span>
+                <div className="bg-[#040407]/60 p-4 rounded-xl border border-white/[0.06] flex flex-col gap-3 font-mono">
+                  <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Calibration Accuracy status</span>
                   
                   {/* Status Badge */}
                   {avgMappingError <= 0.03 ? (
@@ -2858,7 +2954,7 @@ export default function BallBalancerResearch({
                     {avgMappingError <= 0.03 ? (
                       <button
                         onClick={() => onTune({ kp, kd, ki, speed, max_tilt_positive: maxTiltPos, max_tilt_negative: maxTiltNeg, provider: "force", auto_tune: autoTune, loadcell_mode: loadcellMode, loadcell_arm: loadcellArm, ball_weight_ref: ballWeightRef, invert_output: invertOutput, ball_type: ballType })}
-                        className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-[#CFFF3E] text-slate-900 hover:scale-102 active:scale-95 transition"
+                        className="py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-emerald-400 text-black text-slate-900 hover:scale-102 active:scale-95 transition"
                       >
                         Balance Using Load Cell Only
                       </button>
@@ -2866,14 +2962,14 @@ export default function BallBalancerResearch({
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => setActiveApp("training")}
-                          className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-slate-800 text-slate-350 hover:text-white border border-slate-700 transition"
+                          className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-white/[0.04] text-zinc-300 hover:text-white border border-white/[0.08] transition"
                         >
                           Improve Learning (Go to Train)
                         </button>
                         <button
                           onClick={() => onTune({ kp, kd, ki, speed, max_tilt_positive: maxTiltPos, max_tilt_negative: maxTiltNeg, provider: "vision", auto_tune: autoTune, loadcell_mode: loadcellMode, loadcell_arm: loadcellArm, ball_weight_ref: ballWeightRef, invert_output: invertOutput, ball_type: ballType })}
                           disabled={balancerData?.provider === "vision"}
-                          className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-[#CFFF3E]/10 text-[#CFFF3E] border border-[#CFFF3E]/20 hover:bg-[#CFFF3E]/20 transition disabled:opacity-40"
+                          className="py-2 rounded-xl font-bold uppercase tracking-wider text-[9px] bg-emerald-400 text-black/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-400 text-black/20 transition disabled:opacity-40"
                         >
                           Balance on Vision (Default)
                         </button>
@@ -2883,15 +2979,15 @@ export default function BallBalancerResearch({
                 </div>
 
                 {/* 3. Feedback Source Toggle */}
-                <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-850 flex flex-col gap-2 mt-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">Feedback Controller Source</span>
+                <div className="bg-[#040407]/60 p-4 rounded-xl border border-white/[0.06] flex flex-col gap-2 mt-1">
+                  <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider font-mono">Feedback Controller Source</span>
                   <div className="grid grid-cols-2 gap-2 mt-1 font-mono text-[10px]">
                     <button
                       onClick={() => onTune({ kp, kd, ki, speed, max_tilt_positive: maxTiltPos, max_tilt_negative: maxTiltNeg, provider: "vision", auto_tune: autoTune, loadcell_mode: loadcellMode, loadcell_arm: loadcellArm, ball_weight_ref: ballWeightRef, invert_output: invertOutput, ball_type: ballType })}
                       className={`py-2 rounded-lg font-bold uppercase transition ${
                         balancerData?.provider === "vision"
-                          ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                          : "bg-slate-850 text-slate-400 hover:text-white"
+                          ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                          : "bg-[#090A0E] text-zinc-400 hover:text-white"
                       }`}
                     >
                       Use Camera Vision
@@ -2900,8 +2996,8 @@ export default function BallBalancerResearch({
                       onClick={() => onTune({ kp, kd, ki, speed, max_tilt_positive: maxTiltPos, max_tilt_negative: maxTiltNeg, provider: "force", auto_tune: autoTune, loadcell_mode: loadcellMode, loadcell_arm: loadcellArm, ball_weight_ref: ballWeightRef, invert_output: invertOutput, ball_type: ballType })}
                       className={`py-2 rounded-lg font-bold uppercase transition ${
                         balancerData?.provider === "force"
-                          ? "bg-[#CFFF3E] text-slate-900 font-extrabold"
-                          : "bg-slate-850 text-slate-400 hover:text-white"
+                          ? "bg-emerald-400 text-black text-slate-900 font-extrabold"
+                          : "bg-[#090A0E] text-zinc-400 hover:text-white"
                       }`}
                     >
                       Use Load Cells

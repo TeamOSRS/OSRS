@@ -5,41 +5,75 @@ import sys
 import time
 
 
-def _maximize_window(title_substr, timeout=3.0):
-    """Best-effort maximize of the native viewer window (Windows only).
+def ensure_interactive_desktop():
+    """Ensures all threads (including MuJoCo GLFW viewer) attach to the interactive desktop."""
+    if sys.platform != 'win32':
+        return
+    import ctypes, threading
+    u32 = ctypes.windll.user32
+    try:
+        h = u32.OpenDesktopW('Default', 0, False, 0x01FF)
+        if h:
+            u32.SetThreadDesktop(h)
+    except Exception:
+        pass
+    if not getattr(threading.Thread, '_osrs_desktop_patched', False):
+        orig_run = threading.Thread.run
+        def _prun(self, *a, **k):
+            try:
+                h = u32.OpenDesktopW('Default', 0, False, 0x01FF)
+                if h:
+                    u32.SetThreadDesktop(h)
+            except Exception:
+                pass
+            return orig_run(self, *a, **k)
+        threading.Thread.run = _prun
+        threading.Thread._osrs_desktop_patched = True
 
-    launch_passive spawns its GLFW window on a background render thread, so we
-    poll briefly for a visible top-level window whose title contains
-    `title_substr` and maximize it once found.
-    """
+ensure_interactive_desktop()
+
+def _maximize_window(title_substr, timeout=5.0):
+    """Best-effort maximize and focus of the native viewer window on Windows Default desktop."""
     if sys.platform != 'win32':
         return
 
     import ctypes
-
     user32 = ctypes.windll.user32
-    found = []
-
-    @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
-    def _enum_proc(hwnd, _lparam):
-        length = user32.GetWindowTextLengthW(hwnd)
-        if length > 0 and user32.IsWindowVisible(hwnd):
-            buf = ctypes.create_unicode_buffer(length + 1)
-            user32.GetWindowTextW(hwnd, buf, length + 1)
-            if title_substr.lower() in buf.value.lower():
-                found.append(hwnd)
-                return False
-        return True
+    try:
+        hdesk = user32.OpenDesktopW('Default', 0, False, 0x01FF)
+        if hdesk:
+            user32.SetThreadDesktop(hdesk)
+    except Exception:
+        hdesk = None
 
     deadline = time.time() + timeout
-    while time.time() < deadline and not found:
-        user32.EnumWindows(_enum_proc, 0)
-        if not found:
-            time.sleep(0.05)
+    while time.time() < deadline:
+        found = []
+        @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p)
+        def _enum_proc(hwnd, _lparam):
+            if user32.IsWindowVisible(hwnd):
+                length = user32.GetWindowTextLengthW(hwnd)
+                if length > 0:
+                    buf = ctypes.create_unicode_buffer(length + 1)
+                    user32.GetWindowTextW(hwnd, buf, length + 1)
+                    if title_substr.lower() in buf.value.lower():
+                        found.append(hwnd)
+                        return 0
+            return 1
 
-    if found:
-        SW_MAXIMIZE = 3
-        user32.ShowWindow(found[0], SW_MAXIMIZE)
+        if hdesk:
+            user32.EnumDesktopWindows(hdesk, _enum_proc, 0)
+        else:
+            user32.EnumWindows(_enum_proc, 0)
+
+        if found:
+            hwnd = found[0]
+            user32.ShowWindow(hwnd, 9) # SW_RESTORE
+            user32.ShowWindow(hwnd, 3) # SW_MAXIMIZE
+            user32.BringWindowToTop(hwnd)
+            user32.SetForegroundWindow(hwnd)
+            break
+        time.sleep(0.05)
 
 
 def quat_mul(q1, q2):

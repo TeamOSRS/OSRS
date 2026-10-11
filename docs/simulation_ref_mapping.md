@@ -89,3 +89,26 @@ The following table maps the joints defined in the `simulation_ref/my_bot.xml` M
 * **Joint Controller:** Default parameters use PID gains configured in the Control Model:
   - $K_p = 120.0$, $K_i = 6.0$, $K_d = 5.0$
 * **State Updates:** Hardware state is retrieved at 50Hz and broadcast via WebSockets. Replays use a synchronized timeline slider that updates the virtual model state directly.
+
+
+---
+
+## 5. Stage 1: Robotis OpenManipulator-X (OMX) Simulation Mapping
+
+The Stage 1 simulation ([omx_ball_manipulation/](../omx_ball_manipulation/)) modeled dual symmetric 4-DOF OpenManipulator-X arms with end-effector couplers grasping a tiltable plate. The joint layout directly maps to the OMXRobot plugin (src/modules/robots/omx.py):
+
+| Motor ID | MJCF Joint Name (Left / Right) | OSRS Joint Name | Default (ticks) | Min (ticks) | Max (ticks) | Range (rad) | Description |
+|---|---|---|---|---|---|---|---|
+| **11** | left_joint1 / 
+ight_joint1 | Joint 1 - Yaw | 2048 | 0 | 4095 | -3.14 to 3.14 | Base Waist Yaw |
+| **12** | left_joint2 / 
+ight_joint2 | Joint 2 - Shoulder | 2048 | 1024 | 3072 | -1.57 to 1.57 | Shoulder Pitch |
+| **13** | left_joint3 / 
+ight_joint3 | Joint 3 - Elbow | 2048 | 1024 | 3072 | -1.57 to 1.57 | Elbow Pitch |
+| **14** | left_joint4 / 
+ight_joint4 | Joint 4 - Wrist | 2048 | 1024 | 3072 | -1.57 to 1.57 | Wrist Pitch |
+| **15** | left_gripper / 
+ight_gripper | Joint 5 - Gripper | 2048 | 1024 | 3072 | 0.00 to 0.03 m | Gripper Parallel Slide |
+
+* In simulation, the couplers at the end-effectors are rigidly welded to the plate grasp slots ( = 0.2758\text{ m}$).
+* Dual-arm vertical differential displacement: $\Delta z = L_p \sin\theta \implies \theta = \arctan2(2\Delta z, d_{\text{plate}})$.

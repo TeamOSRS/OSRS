@@ -23,6 +23,25 @@ The primary aim of the OSRS Ball Balancer research module is to provide a robust
 4. **Adaptive Scenario-Aware Control**: Self-tune controller gains ($K_p, K_i, K_d$) dynamically based on structural motion profiles (`STUCK_RECOVERY`, `FINE_TUNING`, `EMERGENCY_RETRIEVE`, `PREEMPTIVE_BRAKING`).
 5. **Zero-Overhead Dynamic Modularity**: Decouple hardware drivers, perception filters, and control algorithms through an event-driven Python/C++ architecture integrated with a React-based telemetry dashboard.
 
+### 1.1 Research Genesis & Multi-Stage Experimental Progression
+
+The development of the active ball-balancing platform was conducted across three distinct physical and computational stages:
+
+1. **Stage 1: Foundational Dual-Arm MuJoCo Simulation (omx_ball_manipulation/)**:
+   The foundational stage of this research was modeled and validated using dual ROBOTIS OpenManipulator-X (OMX) robotic arms in the MuJoCo physics engine. In this phase:
+   * The non-linear Lagrangian equation of motion for a rolling sphere ($\ddot{s} = \frac{5}{7}g \sin\theta$) was derived and confirmed under physical contact dynamics.
+   * Differential height-based kinematics ($\Delta z = L_p \sin\theta \implies \theta = \arctan2(2\Delta z, d_{\text{plate}})$) was formulated to manipulate plate tilt using vertical end-effector offsets.
+   * Damped Least-Squares (DLS) Inverse Kinematics and low-pass trajectory filtering ($\alpha = 0.25$) were established to eliminate motor chattering and numerical singularities.
+   * Perspective-n-Point (solvePnP) calibration was developed to reconcile coordinate convention discrepancies between OpenGL (MuJoCo) and OpenCV camera spaces.
+   * Accompanying documentation: [Stage 1 OMX Simulation Guide](../omx_ball_manipulation/README.md), [Control Theory Notes](../omx_ball_manipulation/control_theory_notes.md), and [Camera Localization Theory](../omx_ball_manipulation/camera_localization_theory.md).
+
+2. **Stage 2: Asymmetric Industrial Manipulator Simulation (	wo_arm_ball_manipulation/)**:
+   The second stage scaled the cooperative manipulation principles to heterogeneous industrial arms (Franka Emika FR3 7-DOF + HEAL 6-DOF) with Robotiq 2F-85 parallel grippers. This stage evaluated high-payload dynamics, expanded Cartesian workspaces, and validated 2D setpoint convergence across both roll and pitch axes.
+   * Accompanying documentation: [Stage 2 Two-Arm Simulation Guide](../two_arm_ball_manipulation/README.md).
+
+3. **Stage 3: Physical Platform Deployment & Hybrid Sensor Fusion (src/, docs/, rontend/)**:
+   The final stage transitioned the validated control laws onto physical hardware: a dual-arm humanoid robot with Dynamixel X-series smart servos. This stage introduced real-time Intel RealSense RGB-D perception, dual HX711 strain-gauge load-cell scale estimation, and online Recursive Least Squares (RLS) parameter identification.
+
 ---
 
 ## 2. Distributed Architecture & Software Stack
@@ -249,7 +268,7 @@ To counter mechanical gear backlash when reversing servo direction:
 $$\text{backlash\_comp} = \begin{cases} +15.0\text{ ticks} & \text{if direction changes from } -1 \rightarrow +1 \\ -15.0\text{ ticks} & \text{if direction changes from } +1 \rightarrow -1 \end{cases}$$
 
 #### C. Absolute Joint Tick Calculation
-Target tilt is combined with the calibrated zero-tilt joint offset ($\text{Center}_{\text{L5Y}}$, loaded from `chiman_calibration.json`):
+Target tilt is combined with the calibrated zero-tilt joint offset ($\text{Center}_{\text{L5Y}}$, loaded from `humanoid_calibration.json`):
 
 $$\theta_{\text{raw}} = \text{Center}_{\text{L5Y}} \pm \left( \text{Correction} + \theta_{\text{adaptive}} \right) + \text{backlash\_comp}$$
 $$\theta_{\text{final}} = \text{clamp}\left( \text{Center}_{\text{L5Y}} - \text{Limit}_{\text{neg}}, \; \text{Center}_{\text{L5Y}} + \text{Limit}_{\text{pos}}, \; \theta_{\text{raw}} \right)$$
@@ -298,7 +317,7 @@ Read Camera/Serial       Compute y_fused & v_y   Update est_a & est_b      Selec
 3. **Online RLS Identification**: System computes measured acceleration $\text{acc}_k = \frac{\Delta v_y}{\Delta t}$, computes error against predicted acceleration, and updates parameters $\hat{a}$ and $\hat{b}$.
 4. **Scenario Classification**: Kinematics evaluate thresholds to set current scenario (e.g. `PREEMPTIVE_BRAKING`), setting lookahead time $t_{\text{lookahead}}$ and effective gains $K_p, K_d, K_i$.
 5. **Predictive PD Calculation**: Controller computes forward projected error $e_{\text{pred}} = y + v_y \cdot t_{\text{lookahead}} - y_{\text{target}}$, evaluates PD terms, applies adaptive incline bias, and adds backlash compensation.
-6. **Hardware Write**: Target servo ticks are clamped to calibration bounds (`chiman_calibration.json`) and dispatched asynchronously to Dynamixel servos via `GroupSyncWrite`. Telemetry frame is published over WebSocket `/ws/telemetry`.
+6. **Hardware Write**: Target servo ticks are clamped to calibration bounds (`humanoid_calibration.json`) and dispatched asynchronously to Dynamixel servos via `GroupSyncWrite`. Telemetry frame is published over WebSocket `/ws/telemetry`.
 
 ---
 

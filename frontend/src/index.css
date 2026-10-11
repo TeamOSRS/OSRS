@@ -1,35 +1,146 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #EAEDF1; /* Premium cool grey canvas background */
-  color: #1E2022;            /* Charcoal text primary */
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  overflow-x: hidden;
+  background-color: #000000;
+  color: #F4F4F5;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+/* Atmospheric Ambient Glow Backdrop */
+.bg-pitch-black {
+  background-color: #000000;
+  background-image: 
+    radial-gradient(circle at 50% -15%, rgba(56, 189, 248, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
 }
 
-/* Custom range input (Modern design) */
+/* Fluid Animations */
+@keyframes fluidFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fluid {
+  animation: fluidFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-right {
+  animation: slideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Obsidian Premium Cards & Insets */
+.obsidian-card, .mini-card {
+  background: #090A0E;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1.25rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+}
+
+.obsidian-card:hover, .mini-card:hover {
+  background: #0D0E14;
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1.5px);
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.9);
+}
+
+.obsidian-inset, .mini-inset {
+  background: #040407;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 0.875rem;
+}
+
+/* Reference-Style Pill Buttons (Visuvate & Trade Style) */
+.pill-btn-white {
+  background: #FFFFFF;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.12);
+}
+.pill-btn-white:hover {
+  background: #F4F4F5;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.22);
+  transform: translateY(-0.5px);
+}
+.pill-btn-white:active {
+  transform: scale(0.97);
+}
+
+.pill-btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: #E4E4E7;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pill-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+}
+.pill-btn-ghost:active {
+  transform: scale(0.97);
+}
+
+/* Glowing Neon Accents */
+.glow-emerald {
+  box-shadow: 0 0 16px -2px rgba(16, 185, 129, 0.3);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 16px -2px rgba(56, 189, 248, 0.3);
+}
+
+/* Minimalist Range Sliders with Round Neon Cyan Thumb */
 input[type=range] {
   -webkit-appearance: none;
   background: transparent;
@@ -42,67 +153,78 @@ input[type=range]:focus {
 
 input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
-  height: 6px;
-  background: #E2E8F0; /* Soft track background */
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
-  border: none;
+  transition: background 0.15s ease;
+}
+
+input[type=range]:hover::-webkit-slider-runnable-track {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 input[type=range]::-webkit-slider-thumb {
-  height: 18px;
-  width: 18px;
+  height: 15px;
+  width: 15px;
   border-radius: 50%;
-  background: #1E2022; /* Sleek dark charcoal thumb */
-  border: 2px solid #CFFF3E; /* Neon lime border */
+  background: #38BDF8;
+  border: 2px solid #000000;
   cursor: pointer;
   -webkit-appearance: none;
-  margin-top: -6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  transition: transform 0.1s ease-in-out, background-color 0.1s;
+  margin-top: -5.5px;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+}
+
+input[type=range]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
 }
 
 input[type=range]:active::-webkit-slider-thumb {
-  transform: scale(1.2);
-  background-color: #CFFF3E; /* Swaps to neon lime when active/dragged */
-  border-color: #1E2022;
+  transform: scale(1.3);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 1);
 }
 
-/* Firefox compatibility */
-input[type=range]::-moz-range-track {
-  width: 100%;
+/* Subtle Transparent Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Dedicated Custom Visible Scrollbar Utility */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
   height: 6px;
-  background: #E2E8F0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 9999px;
 }
 
-input[type=range]::-moz-range-thumb {
-  height: 18px;
-  width: 18px;
-  border-radius: 50%;
-  background: #1E2022;
-  border: 2px solid #CFFF3E;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-
-input[type=range]:active::-moz-range-thumb {
-  transform: scale(1.2);
-  background-color: #CFFF3E;
-  border-color: #1E2022;
-}
-
-/* Custom scrollbar specifically for the dark terminal console */
-.terminal-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.terminal-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 9999px;
-}
-.terminal-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(225, 220, 201, 0.4);
-  border-radius: 9999px;
-}
-.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(225, 220, 201, 0.7);
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
 }

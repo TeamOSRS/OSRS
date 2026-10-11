@@ -94,8 +94,19 @@ class RobotManager:
         self.mirror_sync_active = False
 
 
-    def set_robot(self, robot: BaseRobot):
+    def set_robot(self, robot: Any):
         """Switches the active robot profile and updates defaults."""
+        if isinstance(robot, str):
+            if self.plugin_manager:
+                resolved = self.plugin_manager.get_robot(robot)
+                if resolved:
+                    robot = resolved
+                else:
+                    logger.log(f"Unknown robot profile: {robot}", level="WARNING")
+                    return
+            else:
+                logger.log(f"Cannot resolve profile '{robot}' without plugin_manager", level="WARNING")
+                return
         self.active_robot = robot
         self.update_motor_defaults()
         if self.driver is not None:

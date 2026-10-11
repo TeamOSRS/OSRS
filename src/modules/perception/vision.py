@@ -3,7 +3,13 @@ import numpy as np
 import logging
 
 # Import hand_tracker from main path
-from hand_tracker import HandTracker
+try:
+    from src.modules.perception.hand_tracker import HandTracker
+except ImportError:
+    try:
+        from hand_tracker import HandTracker
+    except ImportError:
+        HandTracker = None
 # Import RealSense background tracker thread
 from src.modules.perception.realsense_vision import RealSenseTrackerThread
 

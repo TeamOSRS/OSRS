@@ -52,7 +52,7 @@ def port_conflict_menu(default_port=8000):
     port = default_port
     while is_port_in_use(port):
         print("\n" + "="*60)
-        print(f"⚠️  PORT CONFLICT: Socket address port {port} is already in use!")
+        print(f"[!]  PORT CONFLICT: Socket address port {port} is already in use!")
         print("="*60)
         print("Please choose an option to resolve:")
         print("1) Stop the current process and start a new server")

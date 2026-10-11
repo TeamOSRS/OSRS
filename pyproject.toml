@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osrs-robotics"
+version = "1.2.0"
+description = "OSRS: Open Source Robotics System - Unified Multi-Robot Command Center & MuJoCo Simulation Suite"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Bilal Sabugar", email = "bilal.07.04.07@gmail.com" },
+    { name = "Aditya Jadav", email = "adityajadav203@gmail.com" },
+    { name = "Archie Veera" }
+]
+maintainers = [
+    { name = "Bilal Sabugar", email = "bilal.07.04.07@gmail.com" }
+]
+keywords = [
+    "Bilal Sabugar",
+    "Aditya Jadav",
+    "Archie Veera",
+    "OSRS",
+    "robotics",
+    "mujoco",
+    "dual-arm-manipulation",
+    "ball-balancer",
+    "humanoid",
+    "dynamixel"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.urls]
+Homepage = "https://github.com/BilalSabugar/OSRS"
+Repository = "https://github.com/BilalSabugar/OSRS"
+Documentation = "https://github.com/BilalSabugar/OSRS/tree/main/docs"
+"Bug Tracker" = "https://github.com/BilalSabugar/OSRS/issues"

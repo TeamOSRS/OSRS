@@ -1,6 +1,11 @@
-# Two-Arm (HEAL & Franka FR3) Ball Manipulation
+﻿# Stage 2: Asymmetric Two-Arm (HEAL & Franka FR3) Ball Manipulation Simulation
 
-Self-contained minimal setup for running the dual-arm cooperative plate-balancing and ball manipulation simulation.
+This directory contains the self-contained setup for running the **Stage 2 MuJoCo simulation**, advancing from the symmetric dual OpenManipulator-X setup ([Stage 1](../omx_ball_manipulation/)) to an asymmetric high-payload industrial manipulation platform.
+
+## Research Context
+* **Stage 1 ([`../omx_ball_manipulation`](../omx_ball_manipulation/))**: Symmetric dual OpenManipulator-X arms validating rolling-sphere physics, height-based differential kinematics ($\Delta z = L_p \sin\theta$), and baseline PID stabilization.
+* **Stage 2 (This Directory)**: Heterogeneous asymmetric dual-arm setup (Franka Emika FR3 7-DOF + HEAL 6-DOF arm) with Robotiq 2F-85 grippers, expanding the workspace, dynamic load capacity, and 2D trajectory tracking capabilities.
+* **Stage 3 ([`../src/`](../src/) & [`../simulation_ref/`](../simulation_ref/))**: Full physical robotic platform deployment with humanoid arms, Dynamixel servos, Intel RealSense vision, and load cell sensor fusion.
 
 ## Requirements
 ```bash

@@ -1,7 +1,10 @@
 numpy
+scipy
 opencv-python
 mediapipe
 dynamixel_sdk
+pyserial
 fastapi
 uvicorn
 websockets
+mujoco>=3.0.0

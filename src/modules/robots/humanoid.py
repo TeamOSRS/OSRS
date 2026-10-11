@@ -21,7 +21,7 @@ class HumanoidRobot(BaseRobot):
             11: -1674, 22: 2138, 23: -1275,
             14: 2195, 15: -3, 16: 5117, 17: 2079, 18: 983
         }
-        self.load_chiman_calibration()
+        self.load_humanoid_calibration()
 
     def update_limits_from_calibration(self):
         # Reset to base default limits first to avoid cumulative drift
@@ -46,9 +46,11 @@ class HumanoidRobot(BaseRobot):
                 self.limits[mid]["min"] += diff
                 self.limits[mid]["max"] += diff
 
-    def load_chiman_calibration(self):
+    def load_humanoid_calibration(self):
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        filepath = os.path.join(root_dir, "chiman_calibration.json")
+        filepath = os.path.join(root_dir, "humanoid_calibration.json")
+        if not os.path.exists(filepath):
+            filepath = os.path.join(root_dir, "humanoid_calibration.json")
         if os.path.exists(filepath):
             try:
                 with open(filepath, "r", encoding="utf-8") as f:
@@ -65,9 +67,11 @@ class HumanoidRobot(BaseRobot):
                 pass
         self.update_limits_from_calibration()
 
-    def save_chiman_calibration(self) -> bool:
+    def save_humanoid_calibration(self) -> bool:
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        filepath = os.path.join(root_dir, "chiman_calibration.json")
+        filepath = os.path.join(root_dir, "humanoid_calibration.json")
+        if not os.path.exists(filepath):
+            filepath = os.path.join(root_dir, "humanoid_calibration.json")
         try:
             data = {
                 "calib_left": {str(k): int(v) for k, v in self.calib_left.items()},
@@ -398,3 +402,7 @@ class HumanoidRobot(BaseRobot):
                 manual_positions[14] = int(calib_r4f + delta_ticks)
 
 
+
+    # Backward-compatibility aliases
+    load_chiman_calibration = load_humanoid_calibration
+    save_chiman_calibration = save_humanoid_calibration

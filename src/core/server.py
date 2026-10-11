@@ -6,6 +6,8 @@ import asyncio
 import base64
 import cv2
 import json
+import subprocess
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -980,7 +982,7 @@ def save_calibration(req: CalibrationSaveRequest):
     robot_manager.active_robot.calib_left = {int(k): int(v) for k, v in req.calib_left.items()}
     robot_manager.active_robot.calib_right = {int(k): int(v) for k, v in req.calib_right.items()}
     
-    success = robot_manager.active_robot.save_chiman_calibration()
+    success = robot_manager.active_robot.save_humanoid_calibration()
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save calibration to file.")
         
@@ -1034,7 +1036,7 @@ def capture_calibration(req: Dict[str, str] = Body(...)):
             robot_manager.manual_positions[mid] = val
             robot_manager.target_positions[mid] = val
             
-    robot_manager.active_robot.save_chiman_calibration()
+    robot_manager.active_robot.save_humanoid_calibration()
     return {"status": "success", "captured": {str(k): v for k, v in captured.items()}}
 
 
@@ -1265,6 +1267,316 @@ def set_digital_twin_sync_mode(data: Dict[str, str] = Body(...)):
     raise HTTPException(status_code=400, detail="Digital twin adaptation layer offline.")
 
 # Async Telemetry Stream Broadcast Loop
+
+# =====================================================================
+# Physics Simulation Launcher and Research Paper Architecture
+# =====================================================================
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+SIMULATION_CONFIGS = {
+    "omx_cooperative": {
+        "id": "omx_cooperative",
+        "title": "Stage 1: Dual OpenManipulator-X Cooperative Balancing",
+        "stage": "Stage 1 (MuJoCo)",
+        "category": "OMX Bimanual Manipulation",
+        "description": "Bimanual 4-DOF OpenManipulator-X arms balancing a dynamic ball on a shared tilt plate using joint-space kinematics and DLS inverse kinematics.",
+        "rel_dir": "omx_ball_manipulation",
+        "args": ["simulate_cooperative.py"],
+        "badge": "Cooperative Balancing",
+        "hardware_target": "Dual ROBOTIS OpenManipulator-X",
+        "doc_link": "docs/BALL_BALANCER_RESEARCH_PAPER.md"
+    },
+    "omx_pid": {
+        "id": "omx_pid",
+        "title": "Stage 1: OMX PID Controller Benchmark",
+        "stage": "Stage 1 (MuJoCo)",
+        "category": "OMX Benchmark",
+        "description": "Closed-loop PID baseline test evaluating ball stabilization settling time and steady-state error on dual OMX manipulators.",
+        "rel_dir": "omx_ball_manipulation",
+        "args": ["PID.py"],
+        "badge": "PID Benchmark",
+        "hardware_target": "Dual ROBOTIS OpenManipulator-X",
+        "doc_link": "omx_ball_manipulation/control_theory_notes.md"
+    },
+    "omx_cameras": {
+        "id": "omx_cameras",
+        "title": "Stage 1: Multi-Camera Calibration and Triangulation",
+        "stage": "Stage 1 (MuJoCo / OpenCV)",
+        "category": "Computer Vision",
+        "description": "Multi-view synthetic camera triangulation verifying 3D coordinate recovery with solvePnP and epipolar geometry.",
+        "rel_dir": "omx_ball_manipulation",
+        "args": ["verify_cameras.py"],
+        "badge": "Vision Triangulation",
+        "hardware_target": "Dual RealSense / Synthetic Cameras",
+        "doc_link": "omx_ball_manipulation/camera_localization_theory.md"
+    },
+    "omx_single": {
+        "id": "omx_single",
+        "title": "Stage 1: Standalone OpenManipulator-X Model Viewer",
+        "stage": "Stage 1 (MuJoCo Viewer)",
+        "category": "Kinematics Viewer",
+        "description": "Interactive MuJoCo native viewer inspecting single-arm OpenManipulator-X kinematics, joint limits, and mesh collision geometries.",
+        "rel_dir": "omx_ball_manipulation",
+        "args": ["-m", "mujoco.viewer", "--mjcf=single_arm/scene.xml"],
+        "badge": "MuJoCo Native Viewer",
+        "hardware_target": "Single ROBOTIS OpenManipulator-X",
+        "doc_link": "omx_ball_manipulation/README.md"
+    },
+    "two_arm": {
+        "id": "two_arm",
+        "title": "Stage 2: Asymmetric Two-Arm (Franka FR3 + HEAL) Manipulation",
+        "stage": "Stage 2 (MuJoCo)",
+        "category": "Heterogeneous Bimanual",
+        "description": "7-DOF Franka Emika FR3 arm + 6-DOF HEAL arm bimanual ball balancing with dynamic torque and admittance control under heavy payload.",
+        "rel_dir": "two_arm_ball_manipulation",
+        "args": ["ball_balance_controller.py"],
+        "badge": "Asymmetric Industrial",
+        "hardware_target": "Franka FR3 + HEAL 6-DOF",
+        "doc_link": "two_arm_ball_manipulation/README.md"
+    },
+    "humanoid_plate": {
+        "id": "humanoid_plate",
+        "title": "Stage 3: Humanoid Bimanual Plate Balancing",
+        "stage": "Stage 3 (MuJoCo / Robotis OP3)",
+        "category": "Humanoid Manipulation",
+        "description": "Full humanoid upper-body dual-arm cooperative plate stabilization using dynamic inverse kinematics on Robotis OP3 torso.",
+        "rel_dir": "simulation_ref",
+        "args": ["balance_plate.py"],
+        "badge": "Humanoid Dual-Arm",
+        "hardware_target": "Robotis OP3 Upper-Torso",
+        "doc_link": "docs/simulation_ref_mapping.md"
+    },
+    "humanoid_steering": {
+        "id": "humanoid_steering",
+        "title": "Stage 3: Humanoid Steering Wheel Simulation",
+        "stage": "Stage 3 (MuJoCo / Robotis OP3)",
+        "category": "Humanoid Manipulation",
+        "description": "Cooperative dual-arm manipulation gripping and rotating a vehicle steering wheel in physics simulation.",
+        "rel_dir": "simulation_ref",
+        "args": ["steering_simulation.py"],
+        "badge": "Steering Wheel",
+        "hardware_target": "Robotis OP3 Upper-Torso",
+        "doc_link": "docs/simulation_ref_mapping.md"
+    }
+}
+
+active_sim_info = {
+    "id": None,
+    "process": None,
+    "start_time": None
+}
+
+def get_python_exe():
+    venv_py = os.path.join(PROJECT_ROOT, ".venv", "Scripts", "python.exe")
+    if os.path.exists(venv_py):
+        return venv_py
+    return sys.executable
+
+def get_simulation_status_dict():
+    if active_sim_info["process"] is not None:
+        poll_result = active_sim_info["process"].poll()
+        if poll_result is None:
+            elapsed = time.time() - (active_sim_info["start_time"] or time.time())
+            return {
+                "active": True,
+                "simulation_id": active_sim_info["id"],
+                "pid": active_sim_info["process"].pid,
+                "elapsed_seconds": round(elapsed, 1),
+                "details": SIMULATION_CONFIGS.get(active_sim_info["id"], {})
+            }
+        else:
+            active_sim_info["process"] = None
+            active_sim_info["id"] = None
+            active_sim_info["start_time"] = None
+    return {
+        "active": False,
+        "simulation_id": None,
+        "pid": None,
+        "elapsed_seconds": 0,
+        "details": None
+    }
+
+@app.get("/api/simulation/list")
+def list_simulations():
+    status = get_simulation_status_dict()
+    items = []
+    for s_id, s_cfg in SIMULATION_CONFIGS.items():
+        item = dict(s_cfg)
+        item["is_running"] = (status["active"] and status["simulation_id"] == s_id)
+        items.append(item)
+    return {
+        "simulations": items,
+        "active_simulation": status["simulation_id"],
+        "is_active": status["active"]
+    }
+
+@app.get("/api/simulation/status")
+def get_sim_status():
+    return get_simulation_status_dict()
+
+@app.post("/api/simulation/launch")
+def launch_simulation(payload: Dict[str, Any] = Body(...)):
+    sim_id = payload.get("simulation_id")
+    if not sim_id or sim_id not in SIMULATION_CONFIGS:
+        raise HTTPException(status_code=400, detail=f"Invalid simulation ID: {sim_id}")
+
+    # Terminate existing running simulation if any
+    if active_sim_info["process"] is not None and active_sim_info["process"].poll() is None:
+        p = active_sim_info["process"]
+        try:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+            else:
+                p.terminate()
+        except Exception as e:
+            logger.warning(f"Error stopping running simulation: {e}")
+        active_sim_info["process"] = None
+        active_sim_info["id"] = None
+
+    cfg = SIMULATION_CONFIGS[sim_id]
+    cwd = os.path.join(PROJECT_ROOT, cfg["rel_dir"])
+    py_exe = get_python_exe()
+    cmd = [py_exe] + cfg["args"]
+
+    logger.info(f"Launching simulation '{sim_id}': {' '.join(cmd)} in {cwd}")
+    try:
+        startupinfo = None
+        creationflags = 0
+        env = os.environ.copy()
+        env["PYTHONPATH"] = PROJECT_ROOT + os.pathsep + env.get("PYTHONPATH", "")
+        env["PYTHONUNBUFFERED"] = "1"
+
+        if os.name == "nt":
+            try:
+                from src.shared.win32_display import ensure_interactive_desktop
+                ensure_interactive_desktop()
+            except Exception:
+                pass
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.lpDesktop = r"WinSta0\Default"
+            creationflags = subprocess.CREATE_NEW_CONSOLE
+
+        proc = subprocess.Popen(
+            cmd,
+            cwd=cwd,
+            env=env,
+            startupinfo=startupinfo,
+            creationflags=creationflags
+        )
+        active_sim_info["id"] = sim_id
+        active_sim_info["process"] = proc
+        active_sim_info["start_time"] = time.time()
+        return {
+            "status": "success",
+            "message": f"Successfully launched {cfg['title']}",
+            "simulation_id": sim_id,
+            "pid": proc.pid
+        }
+    except Exception as e:
+        logger.error(f"Failed to launch simulation {sim_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to launch simulation: {str(e)}")
+
+@app.post("/api/simulation/stop")
+def stop_simulation():
+    if active_sim_info["process"] is not None and active_sim_info["process"].poll() is None:
+        p = active_sim_info["process"]
+        sim_id = active_sim_info["id"]
+        try:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+            else:
+                p.terminate()
+        except Exception as e:
+            logger.warning(f"Error terminating simulation: {e}")
+        active_sim_info["process"] = None
+        active_sim_info["id"] = None
+        active_sim_info["start_time"] = None
+        return {"status": "success", "message": f"Simulation {sim_id} terminated successfully."}
+    return {"status": "idle", "message": "No active simulation currently running."}
+
+# Research Paper Documentation APIs
+@app.get("/api/docs/paper/pdf")
+def get_research_paper_pdf():
+    paper_path = os.path.join(PROJECT_ROOT, "docs", "paper", "Toward_Vision_Independent_Tactile_Robotic_Perception.pdf")
+    if not os.path.exists(paper_path):
+        raise HTTPException(status_code=404, detail="Official research paper PDF not found.")
+    return FileResponse(
+        path=paper_path,
+        media_type="application/pdf",
+        filename="Toward_Vision_Independent_Tactile_Robotic_Perception.pdf",
+        headers={"Content-Disposition": "inline; filename=Toward_Vision_Independent_Tactile_Robotic_Perception.pdf"}
+    )
+
+@app.get("/api/docs/paper/info")
+def get_research_paper_info():
+    paper_path = os.path.join(PROJECT_ROOT, "docs", "paper", "Toward_Vision_Independent_Tactile_Robotic_Perception.pdf")
+    exists = os.path.exists(paper_path)
+    file_size_bytes = os.path.getsize(paper_path) if exists else 0
+    return {
+        "title": "Toward Vision-Independent Tactile Robotic Perception",
+        "subtitle": "A Multi-Modal Force-Torque Closed Loop Control Framework for Dynamic Object Balancing",
+        "authors": [
+            {"name": "Aditya Jadav", "role": "System Architecture & Hardware Controls"},
+            {"name": "Archie Veera", "role": "Perception, Multi-Camera solvePnP & Vision Fusion"},
+            {"name": "Bilal Sabugar", "role": "Platform Engineering, RLS Identification & Full-Stack Robotics"}
+        ],
+        "organization": "Open Source Robotics System (OSRS) Research Initiative",
+        "paper_filename": "Toward_Vision_Independent_Tactile_Robotic_Perception.pdf",
+        "pdf_url": "/api/docs/paper/pdf",
+        "file_size_kb": round(file_size_bytes / 1024, 1),
+        "file_exists": exists,
+        "abstract": "Dynamic robotic manipulation traditionally relies heavily on high-speed computer vision systems. However, camera-based perception suffers from transmission latency (30-80 ms), occlusion by robotic end-effectors, and sensitivity to environmental illumination. This research establishes the foundational development of OSRS (Open Source Robotics System) by demonstrating a progression from vision-dependent ball balancing to vision-independent, high-speed (80 Hz) tactile and force feedback. Through three developmental stages—ranging from dual OpenManipulator-X arms to asymmetric industrial arms and humanoid bimanual systems—we formulate Lagrangian contact dynamics, Recursive Least Squares (RLS) online parameter identification, and hybrid multi-modal fusion capable of maintaining sub-millimeter balance stability even during complete visual blackout.",
+        "why_developed": [
+            {
+                "title": "The Visual Latency Bottleneck",
+                "badge": "80Hz Tactile vs 30Hz Vision",
+                "description": "Standard USB and depth cameras operate between 30 Hz and 60 Hz, introducing 30 ms to 80 ms of latency through exposure, USB decoding, OpenCV HSV processing, and contour identification. For high-speed dynamic balance, reaction delays exceeding 15 ms result in phase lag and runaway instability. The HX711 strain-gauge scale pipeline streams at 80 Hz with under 12 ms total latency."
+            },
+            {
+                "title": "Severe End-Effector Occlusion",
+                "badge": "100% Occlusion Survival",
+                "description": "During cooperative bimanual grasping and tilt manipulation, robot arms, grippers, and hands inherently obstruct camera lines-of-sight. Under visual blackout, vision-only controllers lose tracking and drop the object. OSRS tactile perception operates continuously from contact forces regardless of optical line-of-sight."
+            },
+            {
+                "title": "Environmental Lighting Immunity",
+                "badge": "Zero Sensitivity to Light",
+                "description": "Uncontrolled ambient lighting, moving shadows, ceiling flicker, and specular reflections on chrome or metallic spheres destabilize HSV color segmentation. Strain-gauge force perception is completely impervious to photometric noise and optical disturbances."
+            },
+            {
+                "title": "Online System Identification via RLS",
+                "badge": "Dynamic Adaptation",
+                "description": "Real-world payloads and rolling objects vary in weight, radius, and friction coefficients. OSRS incorporates real-time Recursive Least Squares (RLS) parameter identification that estimates control authority 'a' and rolling damping 'b' online without requiring static manual calibration."
+            }
+        ],
+        "stages": [
+            {
+                "stage": "Stage 1",
+                "name": "Dual OpenManipulator-X Cooperative Balancing",
+                "technology": "MuJoCo Physics + DLS IK + solvePnP Calibration",
+                "description": "Foundational modeling deriving Lagrangian contact equations (5/7 g sin θ) and differential vertical plate manipulation across two ROBOTIS 4-DOF arms."
+            },
+            {
+                "stage": "Stage 2",
+                "name": "Asymmetric Industrial Arms (Franka FR3 + HEAL)",
+                "technology": "7-DOF + 6-DOF + Robotiq 2F-85 Grippers",
+                "description": "Scaled cooperative manipulation to heterogeneous industrial degrees of freedom with expanded workspaces and dual-axis 2D setpoint balancing."
+            },
+            {
+                "stage": "Stage 3",
+                "name": "Humanoid Bimanual Manipulation Platform",
+                "technology": "Robotis OP3 Upper-Torso Kinematics",
+                "description": "Upper-torso cooperative plate balancing and vehicle steering wheel rotation under coupled bimanual kinematic constraints."
+            },
+            {
+                "stage": "Stage 4",
+                "name": "Real-World Physical OSRS Multi-Modal Robot",
+                "technology": "Dynamixel Servos + RealSense D435 + Dual HX711 Strain Gauges",
+                "description": "Physical execution platform running 50 Hz real-time multi-threaded control with full-duplex WebSocket telemetry and auto-tuning scenarios."
+            }
+        ]
+    }
+
+
 async def telemetry_broadcast_loop():
     last_frame_sent_time = 0.0
     latest_sent_base64_frame = None
@@ -1440,6 +1752,15 @@ async def startup_event():
 
 @app.on_event("shutdown")
 def shutdown_event():
+    # Terminate active simulation if running
+    if active_sim_info["process"] is not None and active_sim_info["process"].poll() is None:
+        try:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(active_sim_info["process"].pid)], capture_output=True)
+            else:
+                active_sim_info["process"].terminate()
+        except Exception:
+            pass
     robot_manager.disconnect()
     vision = plugin_manager.perception_modules.get("vision")
     if vision:
@@ -1453,6 +1774,15 @@ async def websocket_endpoint(websocket: WebSocket):
 # Serve client files from frontend build
 dist_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend", "dist")
 if os.path.exists(dist_dir):
+    @app.get("/")
+    async def serve_index():
+        index_path = os.path.join(dist_dir, "index.html")
+        return FileResponse(index_path, headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+
     app.mount("/", StaticFiles(directory=dist_dir, html=True), name="static")
 else:
     @app.get("/")

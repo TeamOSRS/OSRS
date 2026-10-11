@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use OSRS or its research modules in your academic work, please cite this repository and the associated research paper as below."
+title: "OSRS: Open Source Robotics System - Unified Multi-Robot Command Center & MuJoCo Simulation Suite"
+version: 1.2.0
+date-released: 2026-10-11
+url: "https://github.com/BilalSabugar/OSRS"
+repository-code: "https://github.com/BilalSabugar/OSRS"
+authors:
+  - family-names: Sabugar
+    given-names: Bilal
+    email: bilal.07.04.07@gmail.com
+    website: "https://github.com/BilalSabugar"
+  - family-names: Jadav
+    given-names: Aditya
+    email: adityajadav203@gmail.com
+    website: "https://github.com/adityajadav203-cpu"
+  - family-names: Veera
+    given-names: Archie
+    website: "https://github.com/archieveera04-del"
+keywords:
+  - "Bilal Sabugar"
+  - "Aditya Jadav"
+  - "Archie Veera"
+  - robotics
+  - mujoco
+  - ball-balancer
+  - dual-arm-manipulation
+  - humanoid-robotics
+  - dynamixel
+  - open-source-robotics
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Sabugar
+      given-names: Bilal
+    - family-names: Jadav
+      given-names: Aditya
+    - family-names: Veera
+      given-names: Archie
+  title: "Toward Vision-Independent Tactile Robotic Perception: Dynamic Ball Balancing via Dual-Arm Multi-Axis Load-Cell State Fusion and Recursive Parameter Estimation"
+  journal: "Open Source Robotics Suite Technical Reports"
+  year: 2026
+  url: "https://github.com/BilalSabugar/OSRS/blob/main/docs/BALL_BALANCER_RESEARCH_PAPER.md"

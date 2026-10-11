@@ -6,6 +6,73 @@ import threading
 import sys
 import os
 import argparse
+
+def ensure_interactive_desktop():
+    """Ensures all threads (including MuJoCo GLFW viewer) attach to the interactive desktop."""
+    if sys.platform != 'win32':
+        return
+    import ctypes
+    u32 = ctypes.windll.user32
+    try:
+        h = u32.OpenDesktopW('Default', 0, False, 0x01FF)
+        if h:
+            u32.SetThreadDesktop(h)
+    except Exception:
+        pass
+    if not getattr(threading.Thread, '_osrs_desktop_patched', False):
+        orig_run = threading.Thread.run
+        def _prun(self, *a, **k):
+            try:
+                h = u32.OpenDesktopW('Default', 0, False, 0x01FF)
+                if h:
+                    u32.SetThreadDesktop(h)
+            except Exception:
+                pass
+            return orig_run(self, *a, **k)
+        threading.Thread.run = _prun
+        threading.Thread._osrs_desktop_patched = True
+
+ensure_interactive_desktop()
+
+def _show_and_focus_window(title_substr="MuJoCo", timeout=5.0):
+    """Brings the native MuJoCo GLFW viewer window to foreground and focuses it on Windows."""
+    if sys.platform != 'win32':
+        return
+    import ctypes
+    user32 = ctypes.windll.user32
+    try:
+        hdesk = user32.OpenDesktopW('Default', 0, False, 0x01FF)
+        if hdesk:
+            user32.SetThreadDesktop(hdesk)
+    except Exception:
+        hdesk = None
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        found = []
+        @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p)
+        def _enum_proc(hwnd, _lparam):
+            if user32.IsWindowVisible(hwnd):
+                length = user32.GetWindowTextLengthW(hwnd)
+                if length > 0:
+                    buf = ctypes.create_unicode_buffer(length + 1)
+                    user32.GetWindowTextW(hwnd, buf, length + 1)
+                    if title_substr.lower() in buf.value.lower():
+                        found.append(hwnd)
+                        return 0
+            return 1
+        if hdesk:
+            user32.EnumDesktopWindows(hdesk, _enum_proc, 0)
+        else:
+            user32.EnumWindows(_enum_proc, 0)
+        if found:
+            hwnd = found[0]
+            user32.ShowWindow(hwnd, 9) # SW_RESTORE
+            user32.ShowWindow(hwnd, 5) # SW_SHOW
+            user32.BringWindowToTop(hwnd)
+            user32.SetForegroundWindow(hwnd)
+            break
+        time.sleep(0.05)
+
 def rx_matrix(phi):
     cos_phi = np.cos(phi)
     sin_phi = np.sin(phi)
@@ -462,15 +529,19 @@ def main():
             sys.exit(1)
             
     # Interactive GUI View Mode
-    # Start the CLI input listener in a separate thread
-    listener_thread = threading.Thread(target=input_listener, daemon=True)
-    listener_thread.start()
+    # Start the CLI input listener in a separate thread ONLY if stdin is a real TTY
+    if sys.stdin.isatty():
+        listener_thread = threading.Thread(target=input_listener, daemon=True)
+        listener_thread.start()
     
     print("Launching MuJoCo passive viewer window...")
     with mujoco.viewer.launch_passive(model, data) as viewer:
+        _show_and_focus_window("MuJoCo", timeout=4.0)
         sim_start_time = data.time
         last_fps_time = time.time()
         fps_counter = 0
+        step_counter = 0
+        steps_per_render = max(1, round(1.0 / 60.0 / model.opt.timestep))
         
         while viewer.is_running() and not exit_simulation:
             step_start = time.time()
@@ -578,8 +649,10 @@ def main():
                 mujoco.mjv_applyPerturbPose(model, data, viewer.perturb, 0)
             mujoco.mj_step(model, data)
             
-            # Sync passive viewer
-            viewer.sync()
+            # Sync passive viewer at 60 Hz to ensure smooth GLFW message pumping
+            step_counter += 1
+            if step_counter % steps_per_render == 0:
+                viewer.sync()
             
             # Calculate FPS
             fps_counter += 1
